@@ -53,6 +53,18 @@ export default function App() {
     setSavedScenarios(storedScenarios);
   }, []);
 
+  // Trigger MathJax typesetting when renderedHtml changes
+  useEffect(() => {
+    if (renderedHtml && window.MathJax) {
+      setTimeout(() => {
+        const resCont = document.getElementById('resultContent');
+        if (resCont) {
+          window.MathJax.typesetPromise([resCont]).catch((err) => console.log("MathJax error:", err.message));
+        }
+      }, 300);
+    }
+  }, [renderedHtml]);
+
   // Show toast notification
   const showToast = (message, type = 'success') => {
     setToast({ show: true, message, type });
@@ -119,7 +131,7 @@ export default function App() {
 
     const sureNum = parseInt(sure);
     if (isNaN(sureNum) || sureNum > 80 || sureNum <= 0) {
-      showToast("Etkinlik süresi en fazla 80 dakika ve sıfırdan büyük olmalıdır!", "error");
+      showToast("Etkinlik süresi en fazla 80 dakika ve sıfardan büyük olmalıdır!", "error");
       return;
     }
 
@@ -305,39 +317,27 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
 
       let formattedText = formatMarkdown(response);
       
-      // Inject standard classes into compiled markdown tables
+      // Inject standard classes into compiled markdown tables using full-depth query selector
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = formattedText;
       
       let isAppendix = false;
-      tempDiv.childNodes.forEach(node => {
-        if (node.tagName === 'H3' && node.innerText.toUpperCase().includes('EKLER')) {
+      const elements = tempDiv.querySelectorAll('*');
+      elements.forEach(el => {
+        if (el.tagName === 'H3' && el.innerText.toUpperCase().includes('EKLER')) {
           isAppendix = true;
         }
-        if (node.tagName === 'DIV' && node.classList.contains('overflow-x-auto')) {
-          const table = node.querySelector('table');
-          if (table) {
-            if (isAppendix) {
-              table.className = "standard-table w-full border border-collapse border-slate-200 my-4 text-sm";
-            } else {
-              table.className = "template-table w-full border border-collapse border-slate-200 my-4 text-sm";
-            }
+        if (el.tagName === 'TABLE') {
+          if (isAppendix) {
+            el.className = "standard-table w-full border border-collapse border-slate-200 my-4 text-sm";
+          } else {
+            el.className = "template-table w-full border border-collapse border-slate-200 my-4 text-sm";
           }
         }
       });
 
       setRenderedHtml(logoHtml + tempDiv.innerHTML);
       showToast("Senaryo başarıyla oluşturuldu!", "success");
-      
-      // Trigger typeset if MathJax is present
-      if (window.MathJax) {
-        setTimeout(() => {
-          const resCont = document.getElementById('resultContent');
-          if (resCont) {
-            window.MathJax.typesetPromise([resCont]).catch((err) => console.log(err.message));
-          }
-        }, 300);
-      }
     } catch (error) {
       showToast("İçerik oluşturulurken bir hata oluştu: " + error.message, "error");
       console.error(error);
@@ -453,12 +453,12 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
 
     const ths = tempDiv.querySelectorAll('th');
     ths.forEach(th => {
-      th.style.backgroundColor = '#00b0f0'; 
+      th.style.backgroundColor = '#3b82f6'; 
       th.style.color = 'white';
       th.style.fontWeight = 'bold';
       th.style.padding = '10px 12px';
       th.style.textAlign = 'left';
-      th.style.border = '1px solid #0096D6';
+      th.style.border = '1px solid #2563eb';
       th.style.fontSize = '12pt';
     });
 
@@ -476,7 +476,7 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
         td.style.fontSize = '11pt';
         
         if (isTemplate && index === 0 && tds.length > 1) { 
-          td.style.backgroundColor = '#f2f2f2';
+          td.style.backgroundColor = '#f8fafc';
           td.style.fontWeight = 'bold';
           td.style.width = '25%';
         }
@@ -595,34 +595,49 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
 
   return (
     <div className="min-h-screen bg-gradient-to-tr from-slate-50 via-slate-100 to-indigo-50/30 p-4 md:p-8 font-sans">
-      {/* Top Menu Bar */}
-      <div className="max-w-7xl mx-auto flex justify-end gap-3 mb-6">
-        <button
-          onClick={() => setIsSavedOpen(true)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm active:scale-95"
-        >
-          <FolderOpen className="w-4 h-4 text-indigo-500" />
-          <span>Kayıtlı Senaryolar</span>
-          {savedScenarios.length > 0 && (
-            <span className="bg-indigo-600 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center font-bold">
-              {savedScenarios.length}
-            </span>
-          )}
-        </button>
+      {/* Top Header Row spanning full width */}
+      <header className="max-w-7xl mx-auto glass-panel rounded-3xl p-6 mb-8 bg-white shadow-md border border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
+        <div className="flex flex-col items-center md:items-start text-center md:text-left">
+          <h1 className="text-2xl md:text-3xl font-extrabold text-slate-800 tracking-tight flex items-center gap-2">
+            💡 Yenilikçi Sınıf Eğitim Atölyesi
+          </h1>
+          <p className="text-slate-500 font-medium text-sm md:text-base mt-1">
+            Yapay Zeka Destekli Aktif Öğrenme Planlayıcısı ve Öğrenme Senaryosu Tasarımcısı
+          </p>
+          <div className="mt-2 inline-block bg-indigo-100 text-indigo-800 px-4 py-1.5 rounded-full text-xs font-bold shadow-sm border border-indigo-200">
+            👨‍🏫 Hasan YILMAZ - Ordu İli Matematik Öğretmeni
+          </div>
+        </div>
 
-        <button
-          onClick={() => setIsSettingsOpen(true)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm active:scale-95"
-        >
-          <Settings className="w-4 h-4 text-indigo-500" />
-          <span>API Ayarları</span>
-        </button>
-      </div>
+        {/* Buttons (Saved Scenarios & API settings) */}
+        <div className="flex flex-wrap gap-3 items-center">
+          <button
+            onClick={() => setIsSavedOpen(true)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm active:scale-95"
+          >
+            <FolderOpen className="w-4 h-4 text-indigo-500" />
+            <span>Kayıtlı Senaryolar</span>
+            {savedScenarios.length > 0 && (
+              <span className="bg-indigo-600 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center font-bold">
+                {savedScenarios.length}
+              </span>
+            )}
+          </button>
+
+          <button
+            onClick={() => setIsSettingsOpen(true)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm active:scale-95"
+          >
+            <Settings className="w-4 h-4 text-indigo-500" />
+            <span>API Ayarları</span>
+          </button>
+        </div>
+      </header>
 
       {/* Main Grid */}
       <main className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left Side: Input Form */}
-        <section className="lg:col-span-6 xl:col-span-5">
+        <section className="lg:col-span-5">
           <InputForm
             belgeTuru={belgeTuru}
             setBelgeTuru={setBelgeTuru}
@@ -647,8 +662,8 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
           />
         </section>
 
-        {/* Right Side: Results & Classroom Drawing */}
-        <section className="lg:col-span-6 xl:col-span-7 space-y-8">
+        {/* Right Side: Welcome Panel, Loading, or Results */}
+        <section className="lg:col-span-7 space-y-8">
           {isLoading && (
             <div className="glass-panel rounded-3xl p-16 text-center space-y-6 bg-white shadow-xl border border-slate-100 flex flex-col items-center justify-center">
               <RefreshCw className="w-16 h-16 text-indigo-600 animate-spin" />
@@ -661,19 +676,74 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
             </div>
           )}
 
-          <ResultPanel
-            renderedHtml={renderedHtml}
-            onSaveToBrowser={handleSaveToBrowser}
-            onCopyOnlyText={handleCopyOnlyText}
-            onDownloadWord={handleDownloadWord}
-            onCopyForWord={handleCopyForWord}
-            onSaveToDrive={handleSaveToDrive}
-            onDeleteFromDrive={handleDeleteFromDrive}
-            driveStatus={driveStatus}
-            onDrawLayout={handleDrawLayout}
-          />
+          {!renderedHtml && !isLoading && (
+            <div className="glass-panel rounded-3xl p-8 md:p-12 text-center bg-white shadow-xl border border-slate-100 space-y-8">
+              <div className="flex justify-center">
+                <div className="bg-indigo-50 p-4 rounded-full text-4xl shadow-inner animate-pulse">
+                  🔮
+                </div>
+              </div>
+              <div className="space-y-3">
+                <h3 className="text-2xl font-bold text-slate-800">
+                  Eğitim Atölyesine Hoş Geldiniz!
+                </h3>
+                <p className="text-sm text-slate-500 max-w-lg mx-auto">
+                  Sol taraftaki form aracılığıyla ders bilgilerini, kazanımları ve FCL alanlarını girerek yapay zeka destekli, Maarif Model uyumlu etkinlik planınızı veya öğrenme senaryonuzu anında tasarlayabilirsiniz.
+                </p>
+              </div>
 
-          {showLayout && <FloorPlanCanvas selectedZones={selectedZones} />}
+              {/* Steps */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left max-w-2xl mx-auto pt-4 border-t border-slate-100">
+                <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100 hover:border-indigo-200 transition-all">
+                  <div className="text-xs font-extrabold text-indigo-600 mb-1">ADIM 1</div>
+                  <h4 className="font-bold text-slate-800 text-sm mb-2">API Ayarını Yapın</h4>
+                  <p className="text-xs text-slate-500 leading-relaxed">
+                    Sağ üstteki "API Ayarları" menüsünden ücretsiz aldığınız Gemini API anahtarınızı tanımlayın.
+                  </p>
+                </div>
+                <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100 hover:border-indigo-200 transition-all">
+                  <div className="text-xs font-extrabold text-indigo-600 mb-1">ADIM 2</div>
+                  <h4 className="font-bold text-slate-800 text-sm mb-2">Bilgileri Doldurun</h4>
+                  <p className="text-xs text-slate-500 leading-relaxed">
+                    Ders adı, süre, sınıf seviyesi, kazanım bilgileri ile FCL alanlarını ve hedeflenen 4C becerilerini seçin.
+                  </p>
+                </div>
+                <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100 hover:border-indigo-200 transition-all">
+                  <div className="text-xs font-extrabold text-indigo-600 mb-1">ADIM 3</div>
+                  <h4 className="font-bold text-slate-800 text-sm mb-2">Senaryo Üretin</h4>
+                  <p className="text-xs text-slate-500 leading-relaxed">
+                    "Senaryo/Plan Metnini Oluştur" butonuna basarak yapay zekanın pedagojik planı çizmesini izleyin!
+                  </p>
+                </div>
+              </div>
+
+              {/* Features badges */}
+              <div className="pt-4 flex flex-wrap justify-center gap-3 text-xs font-bold text-slate-600">
+                <span className="bg-slate-100 px-3.5 py-1.5 rounded-full border border-slate-200">📐 2D Sınıf Çizimi</span>
+                <span className="bg-slate-100 px-3.5 py-1.5 rounded-full border border-slate-200">💾 Yerel Arşivleme</span>
+                <span className="bg-slate-100 px-3.5 py-1.5 rounded-full border border-slate-200">▲ Drive Entegrasyonu</span>
+                <span className="bg-slate-100 px-3.5 py-1.5 rounded-full border border-slate-200">📄 Word Şablon Doldurucu</span>
+              </div>
+            </div>
+          )}
+
+          {renderedHtml && !isLoading && (
+            <>
+              <ResultPanel
+                renderedHtml={renderedHtml}
+                onSaveToBrowser={handleSaveToBrowser}
+                onCopyOnlyText={handleCopyOnlyText}
+                onDownloadWord={handleDownloadWord}
+                onCopyForWord={handleCopyForWord}
+                onSaveToDrive={handleSaveToDrive}
+                onDeleteFromDrive={handleDeleteFromDrive}
+                driveStatus={driveStatus}
+                onDrawLayout={handleDrawLayout}
+              />
+
+              {showLayout && <FloorPlanCanvas selectedZones={selectedZones} />}
+            </>
+          )}
         </section>
       </main>
 

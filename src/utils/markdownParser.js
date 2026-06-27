@@ -15,6 +15,10 @@ export function formatMarkdown(text) {
         return `<div class="overflow-x-auto my-4"><table class="w-full text-sm border-collapse"><thead><tr class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">${headers}</tr></thead><tbody>${rows}</tbody></table></div>`;
     });
     
+    // Parse headings
+    html = html.replace(/^###\s*(.*$)/gim, '<h3 class="text-lg font-bold text-slate-800 mt-6 mb-3 border-b border-slate-100 pb-1">$1</h3>')
+               .replace(/^##\s*(.*$)/gim, '<h2 class="text-xl font-bold text-indigo-700 mt-8 mb-4 border-b border-indigo-100 pb-1.5">$1</h2>');
+
     // Format bold, italics, lists, links, paragraphs, and line breaks
     html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                .replace(/\*(.*?)\*/g, '<em>$1</em>')

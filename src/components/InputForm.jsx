@@ -47,15 +47,7 @@ export default function InputForm({
   };
 
   return (
-    <div className="glass-panel rounded-3xl p-6 md:p-10 mb-8 mt-12 md:mt-0 bg-white shadow-xl border border-slate-100">
-      <header className="text-center mb-10">
-        <h1 className="text-3xl md:text-5xl font-extrabold text-slate-800 mb-3 tracking-tight">💡 Yenilikçi Sınıf Eğitim Atölyesi</h1>
-        <p className="text-slate-600 font-medium md:text-lg">Yapay Zeka Destekli Aktif Öğrenme Planlayıcısı</p>
-        <div className="mt-4 inline-block bg-indigo-100 text-indigo-800 px-5 py-2 rounded-full text-sm font-bold shadow-sm border border-indigo-200">
-          👨‍🏫 Hasan YILMAZ - Matematik Öğretmeni
-        </div>
-      </header>
-      
+    <div className="glass-panel rounded-3xl p-6 md:p-8 mb-8 bg-white shadow-xl border border-slate-100">
       {/* 1. Bölüm: Format Seçimi */}
       <div className="mb-8 bg-slate-50 p-6 rounded-2xl border border-slate-100">
         <h2 className="text-lg font-bold text-slate-800 mb-4">1. Belge Türünü Seçin</h2>
