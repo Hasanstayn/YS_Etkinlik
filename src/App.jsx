@@ -634,118 +634,149 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
         </div>
       </header>
 
-      {/* Main Grid */}
-      <main className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Side: Input Form */}
-        <section className="lg:col-span-5">
-          <InputForm
-            belgeTuru={belgeTuru}
-            setBelgeTuru={setBelgeTuru}
-            ders={ders}
-            setDers={setDers}
-            sinif={sinif}
-            setSinif={setSinif}
-            teknik={teknik}
-            setTeknik={setTeknik}
-            sure={sure}
-            setSure={setSure}
-            yapayZekaAraclari={yapayZekaAraclari}
-            setYapayZekaAraclari={setYapayZekaAraclari}
-            kazanim={kazanim}
-            setKazanim={setKazanim}
-            selectedZones={selectedZones}
-            setSelectedZones={setSelectedZones}
-            selectedSkills={selectedSkills}
-            setSelectedSkills={setSelectedSkills}
-            onSubmit={handleSubmit}
-            isLoading={isLoading}
-          />
-        </section>
+      {/* Conditional Layout */}
+      {!renderedHtml && !isLoading ? (
+        /* 1. INITIAL STATE: Full-Width Centered Welcome Panel + Centered Form */
+        <div className="max-w-7xl mx-auto space-y-8">
+          {/* Full-Width Welcome Panel */}
+          <section className="glass-panel rounded-3xl p-8 md:p-12 text-center bg-white shadow-xl border border-slate-100 space-y-8">
+            <div className="flex justify-center">
+              <div className="bg-indigo-50 p-4 rounded-full text-4xl shadow-inner animate-pulse">
+                🔮
+              </div>
+            </div>
+            <div className="space-y-3">
+              <h3 className="text-2xl md:text-3xl font-extrabold text-slate-800 tracking-tight">
+                Eğitim Atölyesine Hoş Geldiniz!
+              </h3>
+              <p className="text-sm md:text-base text-slate-500 max-w-2xl mx-auto">
+                Aşağıdaki form aracılığıyla ders bilgilerini, kazanımları ve FCL alanlarını girerek yapay zeka destekli, Maarif Model uyumlu etkinlik planınızı veya öğrenme senaryonuzu anında tasarlayabilirsiniz.
+              </p>
+            </div>
 
-        {/* Right Side: Welcome Panel, Loading, or Results */}
-        <section className="lg:col-span-7 space-y-8">
-          {isLoading && (
-            <div className="glass-panel rounded-3xl p-16 text-center space-y-6 bg-white shadow-xl border border-slate-100 flex flex-col items-center justify-center">
-              <RefreshCw className="w-16 h-16 text-indigo-600 animate-spin" />
-              <div>
-                <h3 className="text-xl font-bold text-slate-800">Senaryo Planı Hazırlanıyor...</h3>
-                <p className="text-sm text-slate-500 mt-2">
-                  Yapay zeka pedagojik rehberlere ve Türkiye Yüzyılı Maarif Modeli müfredatına uygun planı tasarlıyor. Bu işlem 1 dakikaya kadar sürebilir.
+            {/* Steps - Wide layout */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left max-w-4xl mx-auto pt-6 border-t border-slate-100">
+              <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 hover:border-indigo-200 hover:shadow-md transition-all">
+                <div className="text-xs font-extrabold text-indigo-600 mb-1">ADIM 1</div>
+                <h4 className="font-bold text-slate-800 text-sm md:text-base mb-2">API Ayarını Yapın</h4>
+                <p className="text-xs md:text-sm text-slate-500 leading-relaxed">
+                  Sağ üstteki "API Ayarları" menüsünden ücretsiz aldığınız Gemini API anahtarınızı tanımlayın.
+                </p>
+              </div>
+              <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 hover:border-indigo-200 hover:shadow-md transition-all">
+                <div className="text-xs font-extrabold text-indigo-600 mb-1">ADIM 2</div>
+                <h4 className="font-bold text-slate-800 text-sm md:text-base mb-2">Bilgileri Doldurun</h4>
+                <p className="text-xs md:text-sm text-slate-500 leading-relaxed">
+                  Ders adı, süre, sınıf seviyesi, kazanım bilgileri ile FCL alanlarını ve hedeflenen 4C becerilerini seçin.
+                  </p>
+              </div>
+              <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 hover:border-indigo-200 hover:shadow-md transition-all">
+                <div className="text-xs font-extrabold text-indigo-600 mb-1">ADIM 3</div>
+                <h4 className="font-bold text-slate-800 text-sm md:text-base mb-2">Senaryo Üretin</h4>
+                <p className="text-xs md:text-sm text-slate-500 leading-relaxed">
+                  En alttaki "Senaryo/Plan Metnini Oluştur" butonuna basarak yapay zekanın pedagojik planı çizmesini izleyin!
                 </p>
               </div>
             </div>
-          )}
 
-          {!renderedHtml && !isLoading && (
-            <div className="glass-panel rounded-3xl p-8 md:p-12 text-center bg-white shadow-xl border border-slate-100 space-y-8">
-              <div className="flex justify-center">
-                <div className="bg-indigo-50 p-4 rounded-full text-4xl shadow-inner animate-pulse">
-                  🔮
-                </div>
-              </div>
-              <div className="space-y-3">
-                <h3 className="text-2xl font-bold text-slate-800">
-                  Eğitim Atölyesine Hoş Geldiniz!
-                </h3>
-                <p className="text-sm text-slate-500 max-w-lg mx-auto">
-                  Sol taraftaki form aracılığıyla ders bilgilerini, kazanımları ve FCL alanlarını girerek yapay zeka destekli, Maarif Model uyumlu etkinlik planınızı veya öğrenme senaryonuzu anında tasarlayabilirsiniz.
-                </p>
-              </div>
-
-              {/* Steps */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left max-w-2xl mx-auto pt-4 border-t border-slate-100">
-                <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100 hover:border-indigo-200 transition-all">
-                  <div className="text-xs font-extrabold text-indigo-600 mb-1">ADIM 1</div>
-                  <h4 className="font-bold text-slate-800 text-sm mb-2">API Ayarını Yapın</h4>
-                  <p className="text-xs text-slate-500 leading-relaxed">
-                    Sağ üstteki "API Ayarları" menüsünden ücretsiz aldığınız Gemini API anahtarınızı tanımlayın.
-                  </p>
-                </div>
-                <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100 hover:border-indigo-200 transition-all">
-                  <div className="text-xs font-extrabold text-indigo-600 mb-1">ADIM 2</div>
-                  <h4 className="font-bold text-slate-800 text-sm mb-2">Bilgileri Doldurun</h4>
-                  <p className="text-xs text-slate-500 leading-relaxed">
-                    Ders adı, süre, sınıf seviyesi, kazanım bilgileri ile FCL alanlarını ve hedeflenen 4C becerilerini seçin.
-                  </p>
-                </div>
-                <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100 hover:border-indigo-200 transition-all">
-                  <div className="text-xs font-extrabold text-indigo-600 mb-1">ADIM 3</div>
-                  <h4 className="font-bold text-slate-800 text-sm mb-2">Senaryo Üretin</h4>
-                  <p className="text-xs text-slate-500 leading-relaxed">
-                    "Senaryo/Plan Metnini Oluştur" butonuna basarak yapay zekanın pedagojik planı çizmesini izleyin!
-                  </p>
-                </div>
-              </div>
-
-              {/* Features badges */}
-              <div className="pt-4 flex flex-wrap justify-center gap-3 text-xs font-bold text-slate-600">
-                <span className="bg-slate-100 px-3.5 py-1.5 rounded-full border border-slate-200">📐 2D Sınıf Çizimi</span>
-                <span className="bg-slate-100 px-3.5 py-1.5 rounded-full border border-slate-200">💾 Yerel Arşivleme</span>
-                <span className="bg-slate-100 px-3.5 py-1.5 rounded-full border border-slate-200">▲ Drive Entegrasyonu</span>
-                <span className="bg-slate-100 px-3.5 py-1.5 rounded-full border border-slate-200">📄 Word Şablon Doldurucu</span>
-              </div>
+            {/* Features badges */}
+            <div className="pt-4 flex flex-wrap justify-center gap-3 text-xs md:text-sm font-bold text-slate-600">
+              <span className="bg-slate-100 px-4 py-2 rounded-full border border-slate-200 shadow-sm">📐 2D Sınıf Çizimi</span>
+              <span className="bg-slate-100 px-4 py-2 rounded-full border border-slate-200 shadow-sm">💾 Yerel Arşivleme</span>
+              <span className="bg-slate-100 px-4 py-2 rounded-full border border-slate-200 shadow-sm">▲ Drive Entegrasyonu</span>
+              <span className="bg-slate-100 px-4 py-2 rounded-full border border-slate-200 shadow-sm">📄 Word Şablon Doldurucu</span>
             </div>
-          )}
+          </section>
 
-          {renderedHtml && !isLoading && (
-            <>
-              <ResultPanel
-                renderedHtml={renderedHtml}
-                onSaveToBrowser={handleSaveToBrowser}
-                onCopyOnlyText={handleCopyOnlyText}
-                onDownloadWord={handleDownloadWord}
-                onCopyForWord={handleCopyForWord}
-                onSaveToDrive={handleSaveToDrive}
-                onDeleteFromDrive={handleDeleteFromDrive}
-                driveStatus={driveStatus}
-                onDrawLayout={handleDrawLayout}
-              />
+          {/* Centered Form */}
+          <section className="max-w-4xl mx-auto">
+            <InputForm
+              belgeTuru={belgeTuru}
+              setBelgeTuru={setBelgeTuru}
+              ders={ders}
+              setDers={setDers}
+              sinif={sinif}
+              setSinif={setSinif}
+              teknik={teknik}
+              setTeknik={setTeknik}
+              sure={sure}
+              setSure={setSure}
+              yapayZekaAraclari={yapayZekaAraclari}
+              setYapayZekaAraclari={setYapayZekaAraclari}
+              kazanim={kazanim}
+              setKazanim={setKazanim}
+              selectedZones={selectedZones}
+              setSelectedZones={setSelectedZones}
+              selectedSkills={selectedSkills}
+              setSelectedSkills={setSelectedSkills}
+              onSubmit={handleSubmit}
+              isLoading={isLoading}
+            />
+          </section>
+        </div>
+      ) : (
+        /* 2. GENERATING/GENERATED STATE: Split Screen Layout */
+        <main className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Left Column: Form */}
+          <section className="lg:col-span-5">
+            <InputForm
+              belgeTuru={belgeTuru}
+              setBelgeTuru={setBelgeTuru}
+              ders={ders}
+              setDers={setDers}
+              sinif={sinif}
+              setSinif={setSinif}
+              teknik={teknik}
+              setTeknik={setTeknik}
+              sure={sure}
+              setSure={setSure}
+              yapayZekaAraclari={yapayZekaAraclari}
+              setYapayZekaAraclari={setYapayZekaAraclari}
+              kazanim={kazanim}
+              setKazanim={setKazanim}
+              selectedZones={selectedZones}
+              setSelectedZones={setSelectedZones}
+              selectedSkills={selectedSkills}
+              setSelectedSkills={setSelectedSkills}
+              onSubmit={handleSubmit}
+              isLoading={isLoading}
+            />
+          </section>
 
-              {showLayout && <FloorPlanCanvas selectedZones={selectedZones} />}
-            </>
-          )}
-        </section>
-      </main>
+          {/* Right Column: Loading or Results */}
+          <section className="lg:col-span-7 space-y-8">
+            {isLoading && (
+              <div className="glass-panel rounded-3xl p-16 text-center space-y-6 bg-white shadow-xl border border-slate-100 flex flex-col items-center justify-center">
+                <RefreshCw className="w-16 h-16 text-indigo-600 animate-spin" />
+                <div>
+                  <h3 className="text-xl font-bold text-slate-800">Senaryo Planı Hazırlanıyor...</h3>
+                  <p className="text-sm text-slate-500 mt-2">
+                    Yapay zeka pedagojik rehberlere ve Türkiye Yüzyılı Maarif Modeli müfredatına uygun planı tasarlıyor. Bu işlem 1 dakikaya kadar sürebilir.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {renderedHtml && !isLoading && (
+              <>
+                <ResultPanel
+                  renderedHtml={renderedHtml}
+                  onSaveToBrowser={handleSaveToBrowser}
+                  onCopyOnlyText={handleCopyOnlyText}
+                  onDownloadWord={handleDownloadWord}
+                  onCopyForWord={handleCopyForWord}
+                  onSaveToDrive={handleSaveToDrive}
+                  onDeleteFromDrive={handleDeleteFromDrive}
+                  driveStatus={driveStatus}
+                  onDrawLayout={handleDrawLayout}
+                />
+
+                {showLayout && <FloorPlanCanvas selectedZones={selectedZones} />}
+              </>
+            )}
+          </section>
+        </main>
+      )}
 
       {/* Modals */}
       <SettingsModal
