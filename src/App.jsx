@@ -150,6 +150,14 @@ export default function App() {
     setRenderedHtml('');
     setLastResponseText('');
 
+    // Smooth scroll to loading card
+    setTimeout(() => {
+      const loadCard = document.getElementById('loadingSection');
+      if (loadCard) {
+        loadCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
+
     const sinifNum = parseInt(sinif);
     const kademeText = (sinifNum >= 5 && sinifNum <= 8) ? "Temel Eğitim" : "Ortaöğretim";
     const sinifEkipmanlari = "Etkileşimli Tahta, 8 Adet Tümleşik Bilgisayar, 12 Adet Dizüstü Bilgisayar, 10 Adet MEB-KİT, 3 Adet Mobil Robot Platform Kiti, Simülasyon Platformu, 3B Yazıcı, Zekâ Oyunları Seti";
@@ -296,7 +304,7 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
 `;
     }
 
-    const systemPrompt = `${roleInstruction}\nDili akademik, profesyonel, anlaşılır ve Türkçe olarak kullan. Anlatımı markdown kullanarak biçimlendir.`;
+    const systemPrompt = `${roleInstruction}\nDili akademik, profesyonel, anlaşılır and Türkçe olarak kullan. Anlatımı markdown kullanarak biçimlendir.`;
     const userPrompt = `Ders: ${ders}\nSeçilen Sınıf Seviyesi: ${sinif}. Sınıf\nÖğrenme Kazanımı: ${kazanim}\n\nÖNEMLİ KURAL: Eğer 'Öğrenme Kazanımı' metninin başında sınıf seviyesi rakamı kodlanmışsa ve seçilen sınıf seviyesi (${sinif}) ile çelişiyorsa, KESİNLİKLE kazanım kodunda yazan sınıf seviyesini esas al.\n\n${teknikPromptText}\n${mobilyaPromptText}\n${yzAracInstruction}\n${kaynakcaInstruction}\n${mufredatKurali}\n${pedagojikKurallar}\n${webAraclariKategorileri}\n${ekYonergeKurali}\nSeçilen Öğrenme Alanları: ${selectedZones.join(', ')}\nSeçilen 4C Becerileri: ${selected4CText}\nEtkinlik Süresi: ${sure} dakika\n\nLütfen yukarıdaki yönergelere uyarak planı/senaryoyu yazınız:\n${formatInstruction}`;
 
     try {
@@ -338,6 +346,14 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
 
       setRenderedHtml(logoHtml + tempDiv.innerHTML);
       showToast("Senaryo başarıyla oluşturuldu!", "success");
+
+      // Auto scroll to result panel
+      setTimeout(() => {
+        const resSec = document.getElementById('resultSection');
+        if (resSec) {
+          resSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 300);
     } catch (error) {
       showToast("İçerik oluşturulurken bir hata oluştu: " + error.message, "error");
       console.error(error);
@@ -372,6 +388,14 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
     setRenderedHtml(scenario.content);
     setLastResponseText(scenario.rawMarkdown || "");
     showToast("Kayıtlı senaryo yüklendi.", "success");
+    
+    // Auto scroll to results when loaded
+    setTimeout(() => {
+      const resSec = document.getElementById('resultSection');
+      if (resSec) {
+        resSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 200);
   };
 
   // Delete Saved Scenario from list
@@ -596,7 +620,7 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
   return (
     <div className="min-h-screen bg-gradient-to-tr from-slate-50 via-slate-100 to-indigo-50/30 p-4 md:p-8 font-sans">
       {/* Top Header Row spanning full width */}
-      <header className="max-w-7xl mx-auto glass-panel rounded-3xl p-6 mb-8 bg-white shadow-md border border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
+      <header className="max-w-4xl mx-auto glass-panel rounded-3xl p-6 mb-8 bg-white shadow-md border border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
         <div className="flex flex-col items-center md:items-start text-center md:text-left">
           <h1 className="text-2xl md:text-3xl font-extrabold text-slate-800 tracking-tight flex items-center gap-2">
             💡 Yenilikçi Sınıf Eğitim Atölyesi
@@ -634,11 +658,10 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
         </div>
       </header>
 
-      {/* Conditional Layout */}
-      {!renderedHtml && !isLoading ? (
-        /* 1. INITIAL STATE: Full-Width Centered Welcome Panel + Centered Form */
-        <div className="max-w-7xl mx-auto space-y-8">
-          {/* Full-Width Welcome Panel */}
+      {/* Unified Vertical Stack Layout */}
+      <div className="max-w-4xl mx-auto space-y-8">
+        {/* 1. Welcome Panel (Only visible initially) */}
+        {!renderedHtml && !isLoading && (
           <section className="glass-panel rounded-3xl p-8 md:p-12 text-center bg-white shadow-xl border border-slate-100 space-y-8">
             <div className="flex justify-center">
               <div className="bg-indigo-50 p-4 rounded-full text-4xl shadow-inner animate-pulse">
@@ -654,7 +677,7 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
               </p>
             </div>
 
-            {/* Steps - Wide layout */}
+            {/* Steps */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left max-w-4xl mx-auto pt-6 border-t border-slate-100">
               <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 hover:border-indigo-200 hover:shadow-md transition-all">
                 <div className="text-xs font-extrabold text-indigo-600 mb-1">ADIM 1</div>
@@ -668,7 +691,7 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
                 <h4 className="font-bold text-slate-800 text-sm md:text-base mb-2">Bilgileri Doldurun</h4>
                 <p className="text-xs md:text-sm text-slate-500 leading-relaxed">
                   Ders adı, süre, sınıf seviyesi, kazanım bilgileri ile öğrenme alanlarını ve hedeflenen 4C becerilerini seçin.
-                  </p>
+                </p>
               </div>
               <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 hover:border-indigo-200 hover:shadow-md transition-all">
                 <div className="text-xs font-extrabold text-indigo-600 mb-1">ADIM 3</div>
@@ -687,96 +710,67 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
               <span className="bg-slate-100 px-4 py-2 rounded-full border border-slate-200 shadow-sm">📄 Word Şablon Doldurucu</span>
             </div>
           </section>
+        )}
 
-          {/* Centered Form */}
-          <section className="max-w-4xl mx-auto">
-            <InputForm
-              belgeTuru={belgeTuru}
-              setBelgeTuru={setBelgeTuru}
-              ders={ders}
-              setDers={setDers}
-              sinif={sinif}
-              setSinif={setSinif}
-              teknik={teknik}
-              setTeknik={setTeknik}
-              sure={sure}
-              setSure={setSure}
-              yapayZekaAraclari={yapayZekaAraclari}
-              setYapayZekaAraclari={setYapayZekaAraclari}
-              kazanim={kazanim}
-              setKazanim={setKazanim}
-              selectedZones={selectedZones}
-              setSelectedZones={setSelectedZones}
-              selectedSkills={selectedSkills}
-              setSelectedSkills={setSelectedSkills}
-              onSubmit={handleSubmit}
-              isLoading={isLoading}
-            />
+        {/* 2. Input Form (Always visible) */}
+        <section>
+          <InputForm
+            belgeTuru={belgeTuru}
+            setBelgeTuru={setBelgeTuru}
+            ders={ders}
+            setDers={setDers}
+            sinif={sinif}
+            setSinif={setSinif}
+            teknik={teknik}
+            setTeknik={setTeknik}
+            sure={sure}
+            setSure={setSure}
+            yapayZekaAraclari={yapayZekaAraclari}
+            setYapayZekaAraclari={setYapayZekaAraclari}
+            kazanim={kazanim}
+            setKazanim={setKazanim}
+            selectedZones={selectedZones}
+            setSelectedZones={setSelectedZones}
+            selectedSkills={selectedSkills}
+            setSelectedSkills={setSelectedSkills}
+            onSubmit={handleSubmit}
+            isLoading={isLoading}
+          />
+        </section>
+
+        {/* 3. Loading Card (Appears under form during generation) */}
+        {isLoading && (
+          <section id="loadingSection" className="glass-panel rounded-3xl p-16 text-center space-y-6 bg-white shadow-xl border border-slate-100 flex flex-col items-center justify-center">
+            <RefreshCw className="w-16 h-16 text-indigo-600 animate-spin" />
+            <div>
+              <h3 className="text-xl font-bold text-slate-800">Senaryo Planı Hazırlanıyor...</h3>
+              <p className="text-sm text-slate-500 mt-2">
+                Yapay zeka pedagojik rehberlere ve Türkiye Yüzyılı Maarif Modeli müfredatına uygun planı tasarlıyor. Bu işlem 1 dakikaya kadar sürebilir.
+              </p>
+            </div>
           </section>
-        </div>
-      ) : (
-        /* 2. GENERATING/GENERATED STATE: Split Screen Layout */
-        <main className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Left Column: Form */}
-          <section className="lg:col-span-5">
-            <InputForm
-              belgeTuru={belgeTuru}
-              setBelgeTuru={setBelgeTuru}
-              ders={ders}
-              setDers={setDers}
-              sinif={sinif}
-              setSinif={setSinif}
-              teknik={teknik}
-              setTeknik={setTeknik}
-              sure={sure}
-              setSure={setSure}
-              yapayZekaAraclari={yapayZekaAraclari}
-              setYapayZekaAraclari={setYapayZekaAraclari}
-              kazanim={kazanim}
-              setKazanim={setKazanim}
-              selectedZones={selectedZones}
-              setSelectedZones={setSelectedZones}
-              selectedSkills={selectedSkills}
-              setSelectedSkills={setSelectedSkills}
-              onSubmit={handleSubmit}
-              isLoading={isLoading}
-            />
-          </section>
+        )}
 
-          {/* Right Column: Loading or Results */}
-          <section className="lg:col-span-7 space-y-8">
-            {isLoading && (
-              <div className="glass-panel rounded-3xl p-16 text-center space-y-6 bg-white shadow-xl border border-slate-100 flex flex-col items-center justify-center">
-                <RefreshCw className="w-16 h-16 text-indigo-600 animate-spin" />
-                <div>
-                  <h3 className="text-xl font-bold text-slate-800">Senaryo Planı Hazırlanıyor...</h3>
-                  <p className="text-sm text-slate-500 mt-2">
-                    Yapay zeka pedagojik rehberlere ve Türkiye Yüzyılı Maarif Modeli müfredatına uygun planı tasarlıyor. Bu işlem 1 dakikaya kadar sürebilir.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {renderedHtml && !isLoading && (
-              <>
-                <ResultPanel
-                  renderedHtml={renderedHtml}
-                  onSaveToBrowser={handleSaveToBrowser}
-                  onCopyOnlyText={handleCopyOnlyText}
-                  onDownloadWord={handleDownloadWord}
-                  onCopyForWord={handleCopyForWord}
-                  onSaveToDrive={handleSaveToDrive}
-                  onDeleteFromDrive={handleDeleteFromDrive}
-                  driveStatus={driveStatus}
-                  onDrawLayout={handleDrawLayout}
-                />
-
-                {showLayout && <FloorPlanCanvas selectedZones={selectedZones} />}
-              </>
-            )}
-          </section>
-        </main>
-      )}
+        {/* 4. Generated Output (ResultPanel + FloorPlanCanvas, below the form) */}
+        {renderedHtml && !isLoading && (
+          <div className="space-y-8">
+            <section id="resultSection">
+              <ResultPanel
+                renderedHtml={renderedHtml}
+                onSaveToBrowser={handleSaveToBrowser}
+                onCopyOnlyText={handleCopyOnlyText}
+                onDownloadWord={handleDownloadWord}
+                onCopyForWord={handleCopyForWord}
+                onSaveToDrive={handleSaveToDrive}
+                onDeleteFromDrive={handleDeleteFromDrive}
+                driveStatus={driveStatus}
+                onDrawLayout={handleDrawLayout}
+              />
+            </section>
+            {showLayout && <FloorPlanCanvas selectedZones={selectedZones} />}
+          </div>
+        )}
+      </div>
 
       {/* Modals */}
       <SettingsModal
