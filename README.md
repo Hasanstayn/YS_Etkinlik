@@ -35,27 +35,3 @@ Uygulamanın yapay zeka özelliklerini kullanabilmesi için bir Google Gemini AP
 Uygulamadaki **"Drive'a Kaydet"** ve **"Drive Klasörü"** özellikleri önceden yapılandırılmıştır. 
 * Hazırladığınız senaryoları doğrudan ortak Google Drive klasörümüze tek tıkla kaydedebilirsiniz.
 * Güvenlik protokolü gereği, sistem sadece **kendi yüklediğiniz dosyaları silmenize** izin verir; diğer öğretmenlerin yüklediği belgelere erişim veya silme yetkiniz bulunmaz.
-
----
-
-## 🛠️ Teknolojiler ve Geliştiriciler İçin Yerel Kurulum
-
-Bu uygulama modern bir **React + Vite** projesidir. Eğer projeyi kendi bilgisayarınızda geliştirmek veya üzerinde değişiklik yapmak isterseniz:
-
-### Kullanılan Teknolojiler
-* **React** (Kullanıcı arayüzü ve durum yönetimi)
-* **Vite** (Hızlı derleme ve geliştirme ortamı)
-* **Tailwind CSS v4** (Modern ve dinamik arayüz tasarımları)
-* **JSZip** (Tarayıcı tarafında Word belgelerini açıp düzenleme)
-* **MathJax** (Matematiksel formüllerin kusursuz render edilmesi)
-
-### Yerel Kurulum Adımları
-```bash
-# Bağımlılıkları yükleyin
-npm install
-
-# Geliştirme sunucusunu başlatın
-npm run dev
-```
-
-Tarayıcınızda `http://localhost:5173/YS_Etkinlik` adresine giderek uygulamayı yerelinizde de çalıştırabilirsiniz.
