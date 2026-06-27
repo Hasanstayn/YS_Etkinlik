@@ -8,6 +8,13 @@ Uygulama sayesinde yapay zeka desteğiyle saniyeler içinde zengin içerikli etk
 
 ---
 
+## 🌐 Uygulamaya Ulaşın ve Hemen Kullanın
+
+Uygulamayı herhangi bir kurulum yapmadan doğrudan tarayıcınız üzerinden ücretsiz kullanabilirsiniz:
+👉 **[Yenilikçi Sınıf Eğitim Atölyesi Planlayıcısı (Canlı Yayın)](https://hasanstayn.github.io/YS_Etkinlik)**
+
+---
+
 ## 🚀 Başlamadan Önce Yapılması Gereken Ayarlar
 
 Sistemi kullanabilmeniz için tarayıcınız üzerinden yapmanız gereken tek bir temel ayar bulunmaktadır:
@@ -31,9 +38,9 @@ Uygulamadaki **"Drive'a Kaydet"** ve **"Drive Klasörü"** özellikleri önceden
 
 ---
 
-## 🛠️ Teknolojiler ve Yerel Kurulum
+## 🛠️ Teknolojiler ve Geliştiriciler İçin Yerel Kurulum
 
-Bu uygulama modern bir **React + Vite** projesidir.
+Bu uygulama modern bir **React + Vite** projesidir. Eğer projeyi kendi bilgisayarınızda geliştirmek veya üzerinde değişiklik yapmak isterseniz:
 
 ### Kullanılan Teknolojiler
 * **React** (Kullanıcı arayüzü ve durum yönetimi)
@@ -42,9 +49,7 @@ Bu uygulama modern bir **React + Vite** projesidir.
 * **JSZip** (Tarayıcı tarafında Word belgelerini açıp düzenleme)
 * **MathJax** (Matematiksel formüllerin kusursuz render edilmesi)
 
-### Kendi Bilgisayarınızda Çalıştırma
-Projeyi klonladıktan sonra yerelinizde çalıştırmak için aşağıdaki komutları kullanabilirsiniz:
-
+### Yerel Kurulum Adımları
 ```bash
 # Bağımlılıkları yükleyin
 npm install
@@ -53,4 +58,4 @@ npm install
 npm run dev
 ```
 
-Tarayıcınızda `http://localhost:5173/YS_Etkinlik` adresine giderek uygulamayı canlı olarak kullanmaya başlayabilirsiniz.
+Tarayıcınızda `http://localhost:5173/YS_Etkinlik` adresine giderek uygulamayı yerelinizde de çalıştırabilirsiniz.
