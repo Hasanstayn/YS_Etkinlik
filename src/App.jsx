@@ -30,6 +30,7 @@ export default function App() {
   const [teknik, setTeknik] = useState('auto');
   const [sure, setSure] = useState('40');
   const [yapayZekaAraclari, setYapayZekaAraclari] = useState('');
+  const [belgeDili, setBelgeDili] = useState('tr');
   const [kazanim, setKazanim] = useState('');
   const [selectedZones, setSelectedZones] = useState([]);
   const [selectedSkills, setSelectedSkills] = useState(['İletişim', 'İş Birliği', 'Eleştirel Düşünme', 'Yaratıcılık']);
@@ -175,7 +176,477 @@ export default function App() {
       ? `KULLANILACAK ARAÇLAR: Öğretmen bu senaryoda SADECE şu yapay zeka veya Web 2.0 araçlarını kullanmak istiyor: "${yapayZekaAraclari}". Lütfen senaryonun tüm adımlarını (özellikle Çevrim İçi Araçlar bölümünü) YALNIZCA bu araçlar üzerine kurgula, kesinlikle farklı bir dijital araç ekleme.`
       : `KULLANILACAK ARAÇLAR: MEB kılavuzlarına ve pedagojik yaklaşıma uygun, güncel ve etkili yapay zeka (AI) ve Web 2.0 araçlarını (örneğin ChatGPT, Canva, Padlet vb. arasından en uygunlarını) sen seçip senaryoya mantıklı bir şekilde entegre et.`;
 
-    let kaynakcaInstruction = `
+    const selected4CText = selectedSkills.join(', ');
+
+    // Localization maps
+    let roleInstruction = "";
+    let formatInstruction = "";
+    let kaynakcaInstruction = "";
+    let mufredatKurali = "";
+    let pedagojikKurallar = "";
+    let webAraclariKategorileri = "";
+    let ekYonergeKurali = "";
+    let altBaslik = "";
+
+    if (belgeDili === 'en') {
+      altBaslik = belgeTuru === "etkinlikPlani" ? "TECHNOLOGY SUPPORTED ACTIVE LEARNING LESSON PLAN" : "TECHNOLOGY FOCUSED LEARNING SCENARIO";
+      roleInstruction = `You are a pedagogy expert AI assistant specialized in designing Technology-Supported Active Learning Lesson Plans in accordance with modern curriculum standards. You must write the entire output in English.`;
+      
+      kaynakcaInstruction = `
+IMPORTANT - BIBLIOGRAPHY GUIDELINES:
+The Bibliography section MUST be written according to the "Innovative Classroom Bibliography Writing Guide":
+- Do NOT use bullet points, dashes (-), numbering or indentation. Write as plain text.
+- Sort the references alphabetically, do NOT divide into categories.
+- Add <br><br> at the end of each reference entry.
+- For Books: Author Last Name, A. (Year). Book title. Publisher.
+- For Curriculum: Ministry of National Education. (2024). [Subject] curriculum. Board of Education. Retrieved 10 May 2026 URL
+- For Online Tools: Platform Name. (n.d.). Content title. Retrieved 10 May 2026 URL
+`;
+      mufredatKurali = `
+CURRICULUM RULE:
+Ensure "Unit/Theme/Learning Area" and "Subject/Content Framework" matches the Course Name (${ders}), Grade Level (${sinif}) and Objectives (${kazanim}). Do not invent them; make sure they correspond to actual curriculum frameworks.
+`;
+      pedagojikKurallar = `
+PEDAGOGICAL & METHODOLOGICAL RULES:
+1. Roles: Students are active researchers, teacher is a facilitator. Eliminate passive lecturing.
+2. 4C Skills: Emphasize how students demonstrate Communication, Collaboration, Critical Thinking, and Creativity (${selected4CText}).
+3. Technology: Align technology tools with active production and coding.
+`;
+      webAraclariKategorileri = `
+RECOMMENDED WEB 2.0 / AI TOOLS:
+- Research/Information: Perplexity, Google Scholar, EBA
+- Collaboration: Padlet, Mentimeter, Miro
+- Coding/Modeling: MEB-KİT Simulator, Tinkercad, Scratch
+- Media/Design: Canva, CapCut, Adobe Express
+- Interaction: Genially, Prezi, Kahoot
+`;
+      ekYonergeKurali = `
+APPLICATION GUIDELINE RULE:
+If "MEB-KİT", "3D Printer" or any advanced tool is used, add a detailed "Application Guideline" table under the APPENDICES section.
+`;
+
+      if (belgeTuru === "etkinlikPlani") {
+        formatInstruction = `
+Format Rule: Output MUST be in the exact markdown table format below. Do not add any text before or after the table.
+
+| General Information | Descriptions |
+|---|---|
+| **Activity ID** | (Assign an ID like ACT-01) |
+| **Activity Title** | (Creative Title - ALL CAPS) |
+| **Overview** | (General summary and purpose of the activity) |
+| **Activity Duration** | ${sure} Minutes |
+| **Level** | ${kademeText} |
+| **Grade Level** | Grade ${sinif} |
+| **Course Name** | ${ders} |
+| **Unit/Theme/Learning Area** | (Identify from the curriculum) |
+| **Subject/Content Framework** | (Curriculum framework matching the objective) |
+| **Learning Outcomes / Objectives** | ${kazanim} |
+| **Hardware / Equipment** | ${sinifEkipmanlari} |
+| **Online Tools & Content** | (No student devices! Only tools operated by the teacher on interactive board) |
+| **Teaching Materials** | (Special handouts, scissors, etc. for this activity) |
+| **Learning Area (Classroom Layout)** | (Explain how you stretch the classroom layout using Esnek Öğrenme Alanları - ${selectedZones.join(', ')} - and mobile desks) |
+| **Students' Placement** | Individual / Small Groups / Whole Class (Specify names) |
+| **Teacher's Role** | Leader / Facilitator / Observer (Specify names) |
+| **Preparation** | (Pre-activity preparation for teacher and students) |
+| **Implementation (Duration: ... min.)** | (Steps matching selected areas - ${selectedZones.join(', ')} - and active learning pedagogy. Total duration must be ${sure} minutes.) |
+| **Closure (Duration: ... min.)** | (Wrapping up, gathering feedback, and general review) |
+| **Assessment & Evaluation** | (Assessment methods matching the objectives) |
+| **References** | (Bibliography) |
+| **Appendices** | Assessment forms and instructions are presented below. |
+
+<br>
+
+### APPENDICES
+(Write assessment forms, rubrics, and instructions outside the table, as separate markdown tables.)
+`;
+      } else {
+        formatInstruction = `
+Format Rule: Output MUST be in the exact markdown tables format below. Do not add any text before or after the tables.
+
+| General Information | Descriptions |
+|---|---|
+| **Scenario ID** | (Assign an ID) |
+| **Scenario Name** | (Creative Title - ALL CAPS) |
+| **Course/Level/Duration** | ${ders} / ${kademeText} / ${sure} Minutes |
+
+| Planning | Descriptions |
+|---|---|
+| **Overview** | (General summary of the scenario) |
+| **Learning Outcomes / Objectives** | (Bullet points) |
+| **Related Curriculum Objectives** | ${kazanim} |
+| **Skills** | (Highlight 4C skills: ${selected4CText}) |
+
+| Preparation | Descriptions |
+|---|---|
+| **Learning Approach** | ${teknikFormatText} |
+| **Tasks** | Teacher: ... <br><br> Student: ... |
+| **Tools & Technologies** | (No student devices!) |
+| **Teaching Materials** | (Special handouts, scissors, etc. for this activity) |
+
+| Implementation | Descriptions |
+|---|---|
+| **Learning Activities** | (Steps matching selected areas - ${selectedZones.join(', ')} - and active learning pedagogy. Total duration must be ${sure} minutes. Append (Related Skills: ${selected4CText}) to each step.) |
+
+| Evaluation | Descriptions |
+|---|---|
+| **Assessment Methods / Tools** | (Methods matching the objectives) |
+
+| Reference | Descriptions |
+|---|---|
+| **Related Links** | (Websites) |
+| **References** | (Bibliography) |
+| **Appendices** | Assessment forms and instructions are presented below. |
+
+<br>
+
+### APPENDICES
+(Write assessment forms, rubrics, and instructions outside the tables, as separate markdown tables.)
+`;
+      }
+    } else if (belgeDili === 'de') {
+      altBaslik = belgeTuru === "etkinlikPlani" ? "TECHNOLOGIEGESTÜTZTER LEHRPLAN FÜR AKTIVES LERNEN" : "TECHNOLOGIEORIENTIERTES LERNSZENARIO";
+      roleInstruction = `Sie sind ein KI-Assistent für Pädagogik, der auf den Entwurf von technologiegestützten Unterrichtsplänen für aktives Lernen spezialisiert ist. Sie müssen die Ausgabe vollständig auf Deutsch verfassen.`;
+      
+      kaynakcaInstruction = `
+WICHTIG - LITERATURVERZEICHNIS-RICHTLINIEN:
+Der Literaturverzeichnis-Bereich MUSS gemäß den Richtlinien verfasst werden:
+- KEINE Aufzählungspunkte, Bindestriche (-), Nummerierungen oder Einrückungen verwenden. Als einfachen Text schreiben.
+- Die Referenzen alphabetisch sortieren, NICHT in Kategorien unterteilen.
+- Am Ende jedes Eintrags <br><br> hinzufügen.
+- Bücher: Nachname, A. (Jahr). Buchtitel. Verlag.
+`;
+      mufredatKurali = `
+LEHRPLANREGEL:
+Stellen Sie sicher, dass die Abschnitte "Einheit/Thema/Lernbereich" und "Inhaltsrahmen" zum Fach (${ders}), der Klassenstufe (${sinif}) und den Lernzielen (${kazanim}) passen. Erfinden Sie diese nicht frei, sondern nutzen Sie reale Lehrplanstrukturen.
+`;
+      pedagojikKurallar = `
+PÄDAGOGISCHE REGELN:
+1. Rollen: Schüler sind aktive Forscher, der Lehrer ist Begleiter. Vermeiden Sie Frontalunterricht.
+2. 4C-Fähigkeiten: Betonen Sie, wie Schüler Kommunikation, Kollaboration, kritisches Denken und Kreativität (${selected4CText}) demonstrieren.
+3. Technologie: Richten Sie technologische Werkzeuge an aktiver Produktion und Programmierung aus.
+`;
+      webAraclariKategorileri = `
+EMPFOHLENE WEB 2.0 / KI-TOOLS:
+- Recherche: Perplexity, Google Scholar, EBA
+- Kollaboration: Padlet, Mentimeter, Miro
+- Programmierung/Modellierung: MEB-KİT Simulator, Tinkercad, Scratch
+- Medien/Design: Canva, CapCut, Adobe Express
+- Interaktion: Genially, Prezi, Kahoot
+`;
+      ekYonergeKurali = `
+RICHTLINIE FÜR ANWENDUNGEN:
+Wenn "MEB-KİT", "3D-Drucker" oder ein fortgeschrittenes Tool verwendet wird, fügen Sie eine detaillierte "Anwendungsrichtlinie" als Tabelle im Abschnitt ANHÄNGE hinzu.
+`;
+
+      if (belgeTuru === "etkinlikPlani") {
+        formatInstruction = `
+Formatregel: Die Ausgabe MUSS im exakten Markdown-Tabellenformat unten erfolgen. Fügen Sie keinen Text vor oder nach der Tabelle hinzu.
+
+| Allgemeine Informationen | Beschreibungen |
+|---|---|
+| **Aktivitäts-ID** | (Zuweisen einer ID wie AKT-01) |
+| **Aktivitätstitel** | (Kreativer Titel - NUR GROSSBUCHSTABEN) |
+| **Überblick** | (Allgemeiner Zweck und Zusammenfassung) |
+| **Aktivitätsdauer** | ${sure} Minuten |
+| **Stufe** | ${kademeText} |
+| **Klassenstufe** | Klasse ${sinif} |
+| **Fachname** | ${ders} |
+| **Einheit/Thema/Lernbereich** | (Aus dem Lehrplan ermitteln) |
+| **Thema/Inhaltsrahmen** | (Passender Inhaltsrahmen zum Lernziel) |
+| **Lernergebnisse / Ziele** | ${kazanim} |
+| **Ausstattung / Hardware** | ${sinifEkipmanlari} |
+| **Online-Tools und Inhalte** | (Keine Schülergeräte! Nur Tools, die der Lehrer am Board nutzt) |
+| **Lehrmaterialien** | (Arbeitsblätter, Schere usw. für diese Aktivität) |
+| **Lernbereich (Klassenzimmer-Layout)** | (Erklären Sie die Raumgestaltung mit den Lernbereichen - ${selectedZones.join(', ')} - und mobilen Tischen) |
+| **Schülerposition** | Einzelarbeit / Kleingruppen / Ganze Klasse (Namen angeben) |
+| **Rolle des Lehrers** | Leiter / Begleiter / Beobachter (Namen angeben) |
+| **Vorbereitung** | (Vorbereitung für Lehrer und Schüler vor Beginn) |
+| **Durchführung (Dauer: ... Min.)** | (Schritte passend zu den ausgewählten Lernbereichen - ${selectedZones.join(', ')} - und Methoden. Gesamtdauer muss ${sure} Minuten betragen.) |
+| **Abschluss (Dauer: ... Min.)** | (Zusammenfassung, Feedback und allgemeine Überprüfung) |
+| **Bewertung und Evaluation** | (Bewertungsmethoden passend zum Lernziel) |
+| **Literatur** | (Literaturverzeichnis) |
+| **Anhänge** | Formulare und Richtlinien sind unten aufgeführt. |
+
+<br>
+
+### ANHÄNGE
+(Formulare, Rubriken und Anleitungen als separate Markdown-Tabellen unten einfügen.)
+`;
+      } else {
+        formatInstruction = `
+Formatregel: Die Ausgabe MUSS im exakten Markdown-Tabellenformat unten erfolgen. Fügen Sie keinen Text vor oder nach der Tabelle hinzu.
+
+| Allgemeine Informationen | Beschreibungen |
+|---|---|
+| **Szenario-ID** | (Zuweisen einer ID) |
+| **Szenario-Name** | (Kreativer Titel - NUR GROSSBUCHSTABEN) |
+| **Fach/Stufe/Dauer** | ${ders} / ${kademeText} / ${sure} Minuten |
+
+| Planung | Beschreibungen |
+|---|---|
+| **Überblick** | (Zusammenfassung des Szenarios) |
+| **Lernergebnisse / Ziele** | (Aufzählungspunkte) |
+| **Relevante Lehrplanziele** | ${kazanim} |
+| **Fertigkeiten** | (4C-Fähigkeiten hervorheben: ${selected4CText}) |
+
+| Vorbereitung | Beschreibungen |
+|---|---|
+| **Lernansatz** | ${teknikFormatText} |
+| **Aufgaben** | Lehrer: ... <br><br> Schüler: ... |
+| **Tools & Technologien** | (Keine Schülergeräte!) |
+| **Lehrmaterialien** | (Spezifische Materialien für diese Aktivität) |
+
+| Durchführung | Beschreibungen |
+|---|---|
+| **Lernaktivitäten** | (Schritte passend zu den ausgewählten Lernbereichen - ${selectedZones.join(', ')} - und Methoden. Gesamtdauer muss ${sure} Minuten betragen. Hängen Sie (Relevante Fertigkeiten: ${selected4CText}) an jeden Schritt an.) |
+
+| Bewertung | Beschreibungen |
+|---|---|
+| **Bewertungsmethoden / Werkzeuge** | (Methoden passend zu den Lernzielen) |
+
+| Referenz | Beschreibungen |
+|---|---|
+| **Verwandte Links** | (Websites) |
+| **Literatur** | (Literaturverzeichnis) |
+| **Anhänge** | Formulare, Rubriken und Richtlinien sind unten aufgeführt. |
+
+<br>
+
+### ANHÄNGE
+(Formulare, Rubriken und Anleitungen als separate Markdown-Tabellen unten einfügen.)
+`;
+      }
+    } else if (belgeDili === 'fr') {
+      altBaslik = belgeTuru === "etkinlikPlani" ? "PLAN DE COURS D'APPRENTISSAGE ACTIF AVEC TECHNOLOGIE" : "SCÉNARIO D'APPRENTISSAGE ORIENTÉ TECHNOLOGIE";
+      roleInstruction = `Vous êtes un assistant IA expert en pédagogie, spécialisé dans la conception de plans de cours d'apprentissage actif soutenus par la technologie. Vous devez écrire l'intégralité de la sortie en français.`;
+      
+      kaynakcaInstruction = `
+IMPORTANT - DIRECTIVES POUR LA BIBLIOGRAPHIE:
+La section Bibliographie DOIT respecter les règles suivantes:
+- NE PAS utiliser de puces, de tirets (-), de numérotation ou d'indentation. Écrire en texte brut.
+- Trier les références par ordre alphabétique, NE PAS diviser par catégories.
+- Ajouter <br><br> à la fin de chaque entrée.
+- Livres: Nom de famille de l'auteur, A. (Année). Titre du livre. Éditeur.
+`;
+      mufredatKurali = `
+RÈGLE DU PROGRAMME:
+Assurez-vous que les sections "Unité/Thème/Domaine d'apprentissage" et "Sujet/Cadre de contenu" correspondent au nom du cours (${ders}), au niveau de classe (${sinif}) et aux objectifs (${kazanim}). Ne les inventez pas.
+`;
+      pedagojikKurallar = `
+RÈGLES PÉDAGOGIQUES:
+1. Rôles: Les élèves sont des chercheurs actifs, l'enseignant est un facilitateur. Pas de cours magistral passif.
+2. Compétences 4C: Soulignez comment les élèves démontrent la communication, la collaboration, la pensée critique et la créativité (${selected4CText}).
+3. Technologie: Orientez les outils technologiques vers la production active et le codage.
+`;
+      webAraclariKategorileri = `
+OUTILS WEB 2.0 / IA RECOMMANDÉS:
+- Recherche: Perplexity, Google Scholar, EBA
+- Collaboration: Padlet, Mentimeter, Miro
+- Codage/Modélisation: Simulateur MEB-KİT, Tinkercad, Scratch
+- Médias/Design: Canva, CapCut, Adobe Express
+- Interaction: Genially, Prezi, Kahoot
+`;
+      ekYonergeKurali = `
+GUIDE D'APPLICATION:
+Si "MEB-KİT", "Imprimante 3D" ou un outil avancé est utilisé, ajoutez un tableau détaillé de "Directives d'application" dans la section ANNEXES.
+`;
+
+      if (belgeTuru === "etkinlikPlani") {
+        formatInstruction = `
+Règle de format: La sortie DOIT être dans le format exact du tableau Markdown ci-dessous. N'ajoutez aucun texte avant ou après le tableau.
+
+| Informations Générales | Descriptions |
+|---|---|
+| **ID de l'activité** | (Attribuer un ID comme ACT-01) |
+| **Titre de l'activité** | (Titre créatif - EN MAJUSCULES) |
+| **Aperçu** | (Résumé et objectif de l'activité) |
+| **Durée de l'activité** | ${sure} Minutes |
+| **Niveau** | ${kademeText} |
+| **Niveau de classe** | Classe de ${sinif} |
+| **Nom du cours** | ${ders} |
+| **Unité/Thème/Domaine d'apprentissage** | (Identifier dans le programme) |
+| **Sujet/Cadre de contenu** | (Cadre correspondant à l'objectif) |
+| **Résultats d'apprentissage / Objectifs** | ${kazanim} |
+| **Matériel / Équipement** | ${sinifEkipmanlari} |
+| **Outils et contenus en ligne** | (Pas d'appareils élèves! Uniquement outils gérés par l'enseignant) |
+| **Matériel didactique** | (Fiches de travail, ciseaux, etc. pour cette activité) |
+| **Zone d'activité (Disposition)** | (Expliquer l'adaptation de l'espace avec les zones - ${selectedZones.join(', ')} - et tables mobiles) |
+| **Position des élèves** | Individuel / Petits groupes / Classe entière |
+| **Rôle de l'enseignant** | Leader / Animateur / Observateur |
+| **Préparation** | (Préparation de l'enseignant et des élèves) |
+| **Mise en œuvre (Durée : ... min)** | (Étapes selon les zones choisies - ${selectedZones.join(', ')} - et la pédagogie. Total doit faire ${sure} minutes.) |
+| **Fin de l'activité (Durée : ... min)** | (Synthèse, retours et bilan) |
+| **Évaluation et examen** | (Méthodes d'évaluation correspondant aux objectifs) |
+| **Bibliographie** | (Références bibliographiques) |
+| **Annexes** | Les formulaires et guides sont présentés ci-dessous. |
+
+<br>
+
+### ANNEXES
+(Formulaires, rubriques et instructions sous forme de tableaux Markdown séparés ci-dessous.)
+`;
+      } else {
+        formatInstruction = `
+Règle de format: La sortie DOIT être dans le format exact du tableau Markdown ci-dessous. N'ajoutez aucun texte avant ou après le tableau.
+
+| Informations Générales | Descriptions |
+|---|---|
+| **ID du scénario** | (Attribuer un ID) |
+| **Nom du scénario** | (Titre créatif - EN MAJUSCULES) |
+| **Cours/Niveau/Durée** | ${ders} / ${kademeText} / ${sure} Minutes |
+
+| Planification | Descriptions |
+|---|---|
+| **Aperçu** | (Résumé du scénario) |
+| **Résultats d'apprentissage / Objectifs** | (Puces) |
+| **Objectifs du programme associés** | ${kazanim} |
+| **Compétences** | (Mettre en valeur les compétences 4C: ${selected4CText}) |
+
+| Préparation | Descriptions |
+|---|---|
+| **Approche d'apprentissage** | ${teknikFormatText} |
+| **Tâches** | Enseignant: ... <br><br> Élève: ... |
+| **Outils & Technologies** | (Pas d'appareils élèves!) |
+| **Matériel didactique** | (Fiches de travail spécifiques, etc.) |
+
+| Mise en œuvre | Descriptions |
+|---|---|
+| **Activités d'apprentissage** | (Étapes selon les zones choisies - ${selectedZones.join(', ')} - et la pédagogie. Total doit faire ${sure} minutes. Ajoutez (Compétences associées: ${selected4CText}) à chaque étape.) |
+
+| Évaluation | Descriptions |
+|---|---|
+| **Méthodes d'évaluation / Outils** | (Méthodes correspondant aux objectifs) |
+
+| Référence | Descriptions |
+|---|---|
+| **Liens connexes** | (Sites web) |
+| **Bibliographie** | (Références bibliographiques) |
+| **Annexes** | Les formulaires et guides sont présentés ci-dessous. |
+
+<br>
+
+### ANNEXES
+(Formulaires, rubriques et instructions sous forme de tableaux Markdown séparés ci-dessous.)
+`;
+      }
+    } else if (belgeDili === 'ar') {
+      altBaslik = belgeTuru === "etkinlikPlani" ? "خطة درس التعلم النشط المدعوم بالتكنولوجيا" : "سيناريو التعلم الموجه نحو التكنولوجيا";
+      roleInstruction = `أنت مساعد ذكاء اصطناعي خبير في أصول التدريس ومستشار لتصميم خطط الدروس والسيناريوهات التعليمية المتوافقة مع معايير المناهج الحديثة. يجب أن تكتب المخرجات باللغة العربية الفصحى بالكامل.`;
+      
+      kaynakcaInstruction = `
+هام - قواعد كتابة المراجع:
+يجب كتابة قسم المراجع وفقًا للقواعد التالية:
+- لا تستخدم النقاط أو الشرطات (-) أو الترقيم. اكتبها كنص عادي.
+- رتب المراجع أبجديًا، ولا تقسمها إلى فئات.
+- أضف <br><br> في نهاية كل مرجع.
+`;
+      mufredatKurali = `
+قاعدة المنهج:
+تأكد من أن أقسام "الوحدة/الموضوع/مجال التعلم" و"إطار المحتوى" مطابقة للمادة (${ders})، والمستوى الصفي (${sinif})، ونواتج التعلم (${kazanim}).
+`;
+      pedagojikKurallar = `
+القواعد التربوية:
+1. الأدوار: الطلاب باحثون نشطون، والمعلم موجه. الغِ الإلقاء التلقيني تمامًا.
+2. مهارات القرن 21: ركز على كيفية إظهار الطلاب لمهارات التواصل والتعاون والتفكير الناقد والابتكار (${selected4CText}).
+3. التكنولوجيا: وجه الأدوات الرقمية نحو الإنتاج والبرمجة النشطة.
+`;
+      webAraclariKategorileri = `
+الأدوات الرقمية الموصى بها:
+- البحث: Perplexity, Google Scholar, EBA
+- التعاون: Padlet, Mentimeter, Miro
+- البرمجة والنمذجة: MEB-KİT Simulator, Tinkercad, Scratch
+- الوسائط والتصميم: Canva, CapCut, Adobe Express
+- التفاعل والتقييم: Genially, Prezi, Kahoot
+`;
+      ekYonergeKurali = `
+قاعدة إرشادات التطبيق:
+إذا تم استخدام "MEB-KİT" أو "طابعة ثلاثية الأبعاد"، فأضف جدولاً تفصيليًا لـ "إرشادات التطبيق" في قسم الملحقات.
+`;
+
+      if (belgeTuru === "etkinlikPlani") {
+        formatInstruction = `
+قاعدة التنسيق: يجب أن تكون المخرجات بتنسيق جدول Markdown التالي تمامًا. لا تضف أي نص قبل أو بعد الجدول.
+
+| معلومات عامة | التوضيحات |
+|---|---|
+| **معرف النشاط** | (حدد معرفًا مثل ACT-01) |
+| **عنوان النشاط** | (عنوان إبداعي - بأحرف كبيرة) |
+| **نظرة عامة** | (ملخص عام وهدف النشاط) |
+| **مدة النشاط** | ${sure} دقيقة |
+| **المرحلة** | ${kademeText} |
+| **المستوى الصفي** | الصف ${sinif} |
+| **اسم المادة** | ${ders} |
+| **الوحدة/الموضوع/مجال التعلم** | (تحديد من المنهج التعليمي) |
+| **إطار المحتوى** | (الإطار المطابق للناتج التعليمي) |
+| **نواتج التعلم / الأهداف** | ${kazanim} |
+| **الأجهزة والمعدات** | ${sinifEkipmanlari} |
+| **الأدوات والمحتويات الرقمية** | (لا توجد أجهزة للطلاب! فقط الأدوات التي يعرضها المعلم على الشاشة تفاعلية) |
+| **المواد التعليمية** | (أوراق عمل خاصة، مقص، إلخ للنشاط) |
+| **منطقة النشاط (بيئة التعلم)** | (شرح تهيئة الصف باستخدام مجالات التعلم - ${selectedZones.join(', ')} - والطاولات المتنقلة) |
+| **موقع الطلاب** | فردي / مجموعات صغيرة / الصف بأكمله |
+| **دور المعلم** | قائد / موجه / مراقب |
+| **التحضير** | (التحضير المسبق للمعلم والطلاب) |
+| **التنفيذ (المدة: ... دقيقة)** | (الخطوات وفقًا لمجالات التعلم المختارة - ${selectedZones.join(', ')} - وأصول التعلم النشط. المجموع ${sure} دقيقة.) |
+| **نهاية النشاط (المدة: ... دقيقة)** | (الختام، جمع التعليقات والمراجعة العامة) |
+| **القياس والتقييم** | (طرق التقييم المطابقة للأهداف التعليمية) |
+| **المراجع** | (قائمة المراجع) |
+| **الملحقات** | النماذج والإرشادات معروضة في الأسفل. |
+
+<br>
+
+### الملحقات
+(اكتب نماذج التقييم والقواعد الإرشادية خارج الجدول الرئيسي كجداول ماركداون منفصلة بالأسفل.)
+`;
+      } else {
+        formatInstruction = `
+قاعدة التنسيق: يجب أن تكون المخرجات بتنسيق جدول Markdown التالي تمامًا. لا تضف أي نص قبل أو بعد الجدول.
+
+| معلومات عامة | التوضيحات |
+|---|---|
+| **معرف السيناريو** | (حدد معرفًا) |
+| **اسم السيناريو** | (عنوان إبداعي - بأحرف كبيرة) |
+| **المادة/المرحلة/المدة** | ${ders} / ${kademeText} / ${sure} دقيقة |
+
+| التخطيط | التوضيحات |
+|---|---|
+| **نظرة عامة** | (ملخص عام للسيناريو) |
+| **نواتج التعلم / الأهداف** | (نقاط) |
+| **أهداف المنهج ذات الصلة** | ${kazanim} |
+| **المهارات** | (التركيز على مهارات القرن 21: ${selected4CText}) |
+
+| التحضير | التوضيحات |
+|---|---|
+| **نهج التعلم** | ${teknikFormatText} |
+| **المهام** | المعلم: ... <br><br> الطالب: ... |
+| **الأدوات والتقنيات** | (لا توجد أجهزة للطلاب!) |
+| **المواد التعليمية** | (المواد التعليمية الخاصة بالنشاط) |
+
+| التنفيذ | التوضيحات |
+|---|---|
+| **أنشطة التعلم** | (الخطوات وفقًا لمجالات التعلم المختارة - ${selectedZones.join(', ')} - وأصول التعلم النشط. المجموع ${sure} دقيقة. أضف (المهارات ذات الصلة: ${selected4CText}) لكل خطوة.) |
+
+| التقييم | التوضيحات |
+|---|---|
+| **أدوات / طرق التقييم** | (طرق التقييم المطابقة للأهداف التعليمية) |
+
+| المراجع | التوضيحات |
+|---|---|
+| **الروابط ذات الصلة** | (مواقع الويب) |
+| **المراجع** | (قائمة المراجع) |
+| **الملحقات** | النماذج والإرشادات معروضة في الأسفل. |
+
+<br>
+
+### الملحقات
+(اكتب نماذج التقييم والقواعد الإرشادية خارج الجدول الرئيسي كجداول ماركداون منفصلة بالأسفل.)
+`;
+      }
+    } else {
+      // Default: Türkçe
+      altBaslik = belgeTuru === "etkinlikPlani" ? "TEKNOLOJİ DESTEKLİ AKTİF ÖĞRENME ETKİNLİK PLANI" : "TEKNOLOJİ ODAKLI ÖĞRENME SENARYOSU";
+      roleInstruction = `Sen, Yenilikçi Sınıf Eğitim Atölyesi için MEB müfredat standartlarına tam uyumlu çalışan pedagoji uzmanı bir yapay zeka asistanısın. Görevin, öğretmenin verdiği bilgiler doğrultusunda "Teknoloji Destekli Aktif Öğrenme Etkinlik Planı" hazırlamaktır.`;
+      
+      kaynakcaInstruction = `
 ÖNEMLİ - KAYNAKÇA YAZIM KURALLARI:
 Eklenen Kaynakça bölümü "Yenilikçi Sınıf Kaynakça Yazım Rehberi"ne uygun OLMALIDIR:
 - Madde işareti (bullet), tire (-), numaralandırma veya girinti KESİNLİKLE KULLANMA. Düz metin olarak yaz.
@@ -188,21 +659,18 @@ Eklenen Kaynakça bölümü "Yenilikçi Sınıf Kaynakça Yazım Rehberi"ne uygu
 - Öğretim Programları: Milli Eğitim Bakanlığı. (2024). [Ders Adı] dersi öğretim programı. Talim ve Terbiye Kurulu Başkanlığı. Erişim tarihi 10 Mayıs 2026 URL
 DİKKAT: Kaynakça tablosunun içine sadece düz metin kaynakları yaz. Çevrim İçi Araçlar bölümünde belirttiğiniz araçları kaynakçaya eklemeyi UNUTMAYIN!
 `;
-
-    const mufredatKurali = `
+      mufredatKurali = `
 ÖNEMLİ MÜFREDAT KURALI (TÜRKİYE YÜZYILI MAARİF MODELİ 2024/2026):
 "Ünite/Tema/Öğrenme Alanı" ve "Konu/İçerik Çerçevesi" bölümlerini kesinlikle uydurmayın veya genel geçer şekilde doldurmayın. Öğretmenin girdiği "Ders" (Örn: Matematik, Temel Matematik, Matematik Uygulamaları, Fen Bilimleri, Fizik, Kimya, Biyoloji, Türkçe, Türk Dili ve Edebiyatı, Sosyal Bilgiler, Tarih, T.C. İnkılap Tarihi ve Atatürkçülük, Coğrafya, Felsefe vb.), "Sınıf Seviyesi" ve "Kazanım" bilgilerini analiz edin. 
 Bu bilgileri MEB'in güncel Türkiye Yüzyılı Maarif Modeli öğretim programları ile eşleştirerek, tam ve doğru "Öğrenme Alanı/Tema/Ünite" adını ve "Konu/İçerik Çerçevesi"ni tespit edip tablodaki ilgili alanlara yazın.
 `;
-
-    const pedagojikKurallar = `
+      pedagojikKurallar = `
 PEDAGOJİK VE METODOLOJİK KURALLAR:
 1. Rol Tanımları: Öğrenciler aktif araştırmacı, öğretmen ise rehberdir. Geleneksel düz anlatımı tamamen ortadan kaldırın.
 2. 4C Entegrasyonu: Her adımda öğrencilerin İletişim, İş Birliği, Eleştirel Düşünme ve Yaratıcılık becerilerini nasıl sergilediğini açıklayın.
 3. Teknolojinin Rolü: Teknolojiyi sadece sunum veya tüketim için değil, esnek öğrenme alanlarına uygun olarak aktif üretim ve analiz (MEB-KİT kodlama, 3B modelleme vb.) için konumlandırın.
 `;
-
-    const webAraclariKategorileri = `
+      webAraclariKategorileri = `
 KATEGORİLERE GÖRE TAVSİYE EDİLEN YAPAY ZEKA VE WEB 2.0 ARAÇLARI:
 - Bilgi Toplama/Araştırma: Perplexity, Google Akademik, EBA
 - İş Birliği/Geri Bildirim: Padlet, Mentimeter, Miro
@@ -210,21 +678,13 @@ KATEGORİLERE GÖRE TAVSİYE EDİLEN YAPAY ZEKA VE WEB 2.0 ARAÇLARI:
 - Üretim/Medya Tasarımı: Canva, CapCut, Adobe Express
 - Sunum/Etkileşim: Genially, Prezi, Kahoot
 `;
-
-    const ekYonergeKurali = `
+      ekYonergeKurali = `
 ÖNEMLİ YÖNERGE KURALI (MEB-KİT, 3B Yazıcı ve Kategori Dışı Araçlar İçin):
 Eğer senaryoda "MEB-KİT", "3B Yazıcı" veya yukarıdaki listelerde bulunmayan farklı bir çevrim içi araç kullanılıyorsa, EKLER bölümüne KESİNLİKLE detaylı bir "Uygulama Yönergesi" tablosu ekleyin. Devre bağlantıları, pin yapılandırmaları veya 3D baskı (slicing) ayarlarını adım adım belirtin.
 `;
 
-    const selected4CText = selectedSkills.join(', ');
-
-    let roleInstruction = "";
-    let formatInstruction = "";
-
-    if (belgeTuru === "etkinlikPlani") {
-      roleInstruction = `Sen, Yenilikçi Sınıf Eğitim Atölyesi için MEB müfredat standartlarına tam uyumlu çalışan pedagoji uzmanı bir yapay zeka asistanısın. Görevin, öğretmenin verdiği bilgiler doğrultusunda "Teknoloji Destekli Aktif Öğrenme Etkinlik Planı" hazırlamaktır.`;
-      
-      formatInstruction = `
+      if (belgeTuru === "etkinlikPlani") {
+        formatInstruction = `
 Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu formatında ver. Tablonun üstüne veya altına hiçbir açıklama metni, giriş veya çıkış ekleme. Sadece tabloyu yaz.
 
 | Genel Bilgiler | Açıklamalar |
@@ -257,10 +717,8 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
 ### EKLER
 (Biçimlendirici veya özetleyici formların/yönergelerin TAM İÇERİĞİNİ bu tablonun dışında, KESİNLİKLE ayrı markdown tabloları halinde buraya ekle.)
 `;
-    } else {
-      roleInstruction = `Sen, Yenilikçi Sınıf Eğitim Atölyesi için MEB standartlarına tam uyumlu çalışan pedagoji uzmanı bir yapay zeka asistanısın. Görevin, öğretmenin verdiği bilgiler doğrultusunda "Teknoloji Odaklı Öğrenme Senaryosu (TOÖS)" hazırlamaktır.`;
-      
-      formatInstruction = `
+      } else {
+        formatInstruction = `
 Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu formatında ver. Tablonun üstüne veya altına hiçbir açıklama metni, giriş veya çıkış ekleme. Sadece tabloyu yaz.
 
 | Genel Bilgiler | Açıklamalar |
@@ -302,16 +760,16 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
 ### EKLER
 (Biçimlendirici, özetleyici formların veya yönergelerin TAM İÇERİĞİNİ ana tablonun içine DEĞİL, BURAYA AYRI VE OKUNAKLI NORMAL MARKDOWN TABLOLARI halinde KESİNLİKLE çizin/yazın.)
 `;
+      }
     }
 
-    const systemPrompt = `${roleInstruction}\nDili akademik, profesyonel, anlaşılır and Türkçe olarak kullan. Anlatımı markdown kullanarak biçimlendir.`;
+    const systemPrompt = `${roleInstruction}\nDili akademik, profesyonel, anlaşılır and ${targetLangName} olarak kullan. Anlatımı markdown kullanarak biçimlendir.`;
     const userPrompt = `Ders: ${ders}\nSeçilen Sınıf Seviyesi: ${sinif}. Sınıf\nÖğrenme Kazanımı: ${kazanim}\n\nÖNEMLİ KURAL: Eğer 'Öğrenme Kazanımı' metninin başında sınıf seviyesi rakamı kodlanmışsa ve seçilen sınıf seviyesi (${sinif}) ile çelişiyorsa, KESİNLİKLE kazanım kodunda yazan sınıf seviyesini esas al.\n\n${teknikPromptText}\n${mobilyaPromptText}\n${yzAracInstruction}\n${kaynakcaInstruction}\n${mufredatKurali}\n${pedagojikKurallar}\n${webAraclariKategorileri}\n${ekYonergeKurali}\nSeçilen Öğrenme Alanları: ${selectedZones.join(', ')}\nSeçilen 4C Becerileri: ${selected4CText}\nEtkinlik Süresi: ${sure} dakika\n\nLütfen yukarıdaki yönergelere uyarak planı/senaryoyu yazınız:\n${formatInstruction}`;
 
     try {
       const response = await callGeminiText(systemPrompt, userPrompt, apiKey);
       setLastResponseText(response);
       
-      const altBaslik = belgeTuru === "etkinlikPlani" ? "TEKNOLOJİ DESTEKLİ AKTİF ÖĞRENME ETKİNLİK PLANI" : "TEKNOLOJİ ODAKLI ÖĞRENME SENARYOSU";
       const logoHtml = `
       <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #e2e8f0; padding-bottom: 20px;">
           <div style="line-height: 1; margin-bottom: 10px;">
@@ -332,7 +790,8 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
       let isAppendix = false;
       const elements = tempDiv.querySelectorAll('*');
       elements.forEach(el => {
-        if (el.tagName === 'H3' && el.innerText.toUpperCase().includes('EKLER')) {
+        const text = el.innerText.toUpperCase();
+        if (el.tagName === 'H3' && (text.includes('EKLER') || text.includes('APPENDICES') || text.includes('ANHÄNGE') || text.includes('ANNEXES') || text.includes('الملحقات'))) {
           isAppendix = true;
         }
         if (el.tagName === 'TABLE') {
@@ -727,6 +1186,8 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
             setSure={setSure}
             yapayZekaAraclari={yapayZekaAraclari}
             setYapayZekaAraclari={setYapayZekaAraclari}
+            belgeDili={belgeDili}
+            setBelgeDili={setBelgeDili}
             kazanim={kazanim}
             setKazanim={setKazanim}
             selectedZones={selectedZones}

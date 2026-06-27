@@ -24,6 +24,7 @@ export default function InputForm({
   teknik, setTeknik,
   sure, setSure,
   yapayZekaAraclari, setYapayZekaAraclari,
+  belgeDili, setBelgeDili,
   kazanim, setKazanim,
   selectedZones, setSelectedZones,
   selectedSkills, setSelectedSkills,
@@ -140,7 +141,22 @@ export default function InputForm({
             />
           </div>
 
-          <div className="space-y-2 md:col-span-2">
+          <div className="space-y-2">
+            <label className="text-sm font-bold text-slate-700 ml-1">Belge Dili (Document Language)</label>
+            <select 
+              value={belgeDili}
+              onChange={(e) => setBelgeDili(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all bg-slate-50 text-sm font-semibold"
+            >
+              <option value="tr">Türkçe</option>
+              <option value="en">English (İngilizce)</option>
+              <option value="de">Deutsch (Almanca)</option>
+              <option value="fr">Français (Fransızca)</option>
+              <option value="ar">العربية (Arapça)</option>
+            </select>
+          </div>
+
+          <div className="space-y-2">
             <label className="text-sm font-bold text-slate-700 ml-1">YZ / Web 2.0 Araçları (İsteğe Bağlı)</label>
             <input 
               type="text" 
