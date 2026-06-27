@@ -2,7 +2,7 @@
 
 Yapay Zeka Destekli Aktif Öğrenme Planlayıcısı ve Öğrenme Senaryosu (TOÖS) Tasarımcısı.
 
-Merhaba! Ben **Hasan YILMAZ**, Matematik Öğretmeniyim. Bu proje, öğretmenlerimizin derslerinde aktif öğrenme tekniklerini, Türkiye Yüzyılı Maarif Modeli müfredat standartlarını ve Esnek Öğrenme Alanları (FCL) pedagojilerini kolayca planlayabilmeleri için geliştirilmiş modern bir web uygulamasıdır.
+Merhaba! Ben Hasan YILMAZ, Ordu ilinde Matematik Öğretmeniyim. Bu proje, öğretmenlerimizin derslerinde aktif öğrenme tekniklerini, Türkiye Yüzyılı Maarif Modeli müfredat standartlarını ve Esnek Öğrenme Alanları pedagojilerini kolayca planlayabilmeleri için geliştirilmiş modern bir web uygulamasıdır.
 
 Uygulama sayesinde yapay zeka desteğiyle saniyeler içinde zengin içerikli etkinlik planları ve öğrenme senaryoları üretebilir, bunları sınıfınızın 2D yerleşim planıyla birlikte görüntüleyebilir, doğrudan orijinal Word (.docx) şablonuna doldurulmuş olarak bilgisayarınıza indirebilir veya Google Drive klasörümüze kaydedebilirsiniz.
 
