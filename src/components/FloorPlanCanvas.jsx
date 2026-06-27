@@ -461,6 +461,18 @@ export default function FloorPlanCanvas({ selectedZones }) {
       // 2 modular desks facing each other (rectangle block)
       newGroupItems.push({ id: `desk_double_${timestamp}_0`, type: 'desk', x: cx, y: cy - 14, rotation: 180 });
       newGroupItems.push({ id: `desk_double_${timestamp}_1`, type: 'desk', x: cx, y: cy + 14, rotation: 0 });
+    } else if (groupType === 'quad') {
+      // 4-person block (two double desks side-by-side)
+      newGroupItems.push({ id: `desk_quad_${timestamp}_0`, type: 'desk', x: cx - 16, y: cy - 14, rotation: 180 });
+      newGroupItems.push({ id: `desk_quad_${timestamp}_1`, type: 'desk', x: cx - 16, y: cy + 14, rotation: 0 });
+      newGroupItems.push({ id: `desk_quad_${timestamp}_2`, type: 'desk', x: cx + 16, y: cy - 14, rotation: 180 });
+      newGroupItems.push({ id: `desk_quad_${timestamp}_3`, type: 'desk', x: cx + 16, y: cy + 14, rotation: 0 });
+    } else if (groupType === 'zigzag') {
+      // 4-person zigzag row (alternating side-by-side)
+      newGroupItems.push({ id: `desk_zig_${timestamp}_0`, type: 'desk', x: cx - 48, y: cy + 14, rotation: 0 });
+      newGroupItems.push({ id: `desk_zig_${timestamp}_1`, type: 'desk', x: cx - 16, y: cy - 14, rotation: 180 });
+      newGroupItems.push({ id: `desk_zig_${timestamp}_2`, type: 'desk', x: cx + 16, y: cy + 14, rotation: 0 });
+      newGroupItems.push({ id: `desk_zig_${timestamp}_3`, type: 'desk', x: cx + 48, y: cy - 14, rotation: 180 });
     }
 
     setItems(prev => [...prev, ...newGroupItems]);
@@ -622,6 +634,18 @@ export default function FloorPlanCanvas({ selectedZones }) {
                 className="flex items-center gap-1 px-3 py-2 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 rounded-xl text-xs font-semibold text-indigo-800 shadow-sm transition-all"
               >
                 <span>🔺 Üçlü Masa Kümesi</span>
+              </button>
+              <button
+                onClick={() => handleAddGroup('quad')}
+                className="flex items-center gap-1 px-3 py-2 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 rounded-xl text-xs font-semibold text-indigo-800 shadow-sm transition-all"
+              >
+                <span>🟦 Dörtlü Masa Kümesi (Blok)</span>
+              </button>
+              <button
+                onClick={() => handleAddGroup('zigzag')}
+                className="flex items-center gap-1 px-3 py-2 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 rounded-xl text-xs font-semibold text-indigo-800 shadow-sm transition-all"
+              >
+                <span>〰️ Dörtlü Dalga Kümesi (Zigzag)</span>
               </button>
               <button
                 onClick={() => handleAddGroup('hex')}
