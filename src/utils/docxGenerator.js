@@ -42,21 +42,21 @@ export async function generateDocxBlob(lastResponseText, renderedHtmlContent) {
     const xmlDoc = parser.parseFromString(xmlString, "application/xml");
     
     const ns = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
-    const tables = xmlDoc.getElementsByTagNameNS(ns, "w:tbl");
+    const tables = xmlDoc.getElementsByTagNameNS(ns, "tbl");
     if (tables.length === 0) throw new Error("Şablonda tablo bulunamadı.");
     
     const table = tables[0];
-    const rows = table.getElementsByTagNameNS(ns, "w:tr");
+    const rows = table.getElementsByTagNameNS(ns, "tr");
     
     function fillCell(rowIdx, cellIdx, text, isBold = false) {
         if (rowIdx >= rows.length) return;
         const row = rows[rowIdx];
-        const cells = row.getElementsByTagNameNS(ns, "w:tc");
+        const cells = row.getElementsByTagNameNS(ns, "tc");
         if (cellIdx >= cells.length) return;
         const cell = cells[cellIdx];
         
         // Remove existing paragraphs
-        const paras = Array.from(cell.getElementsByTagNameNS(ns, "w:p"));
+        const paras = Array.from(cell.getElementsByTagNameNS(ns, "p"));
         paras.forEach(p => cell.removeChild(p));
         
         const cleanText = text.replace(/<br\s*\/?>/gi, "\n");
@@ -155,10 +155,10 @@ export async function generateDocxBlob(lastResponseText, renderedHtmlContent) {
     // Replacements for minutes in row headers
     function replaceDurationInCellText(rowIdx, cellIdx, placeholder, replacement) {
         if (rowIdx >= rows.length) return;
-        const cells = rows[rowIdx].getElementsByTagNameNS(ns, "w:tc");
+        const cells = rows[rowIdx].getElementsByTagNameNS(ns, "tc");
         if (cellIdx >= cells.length) return;
         const cell = cells[cellIdx];
-        const texts = cell.getElementsByTagNameNS(ns, "w:t");
+        const texts = cell.getElementsByTagNameNS(ns, "t");
         for (let i = 0; i < texts.length; i++) {
             if (texts[i].textContent.includes(placeholder)) {
                 texts[i].textContent = texts[i].textContent.replace(placeholder, replacement);
