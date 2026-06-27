@@ -136,7 +136,7 @@ export default function App() {
     }
 
     if (selectedZones.length === 0) {
-      showToast("Lütfen en az bir FCL alanı seçin.", "error");
+      showToast("Lütfen en az bir öğrenme alanı seçin.", "error");
       return;
     }
 
@@ -191,7 +191,7 @@ Bu bilgileri MEB'in güncel Türkiye Yüzyılı Maarif Modeli öğretim programl
 PEDAGOJİK VE METODOLOJİK KURALLAR:
 1. Rol Tanımları: Öğrenciler aktif araştırmacı, öğretmen ise rehberdir. Geleneksel düz anlatımı tamamen ortadan kaldırın.
 2. 4C Entegrasyonu: Her adımda öğrencilerin İletişim, İş Birliği, Eleştirel Düşünme ve Yaratıcılık becerilerini nasıl sergilediğini açıklayın.
-3. Teknolojinin Rolü: Teknolojiyi sadece sunum veya tüketim için değil, FCL alanlarına uygun olarak aktif üretim ve analiz (MEB-KİT kodlama, 3B modelleme vb.) için konumlandırın.
+3. Teknolojinin Rolü: Teknolojiyi sadece sunum veya tüketim için değil, esnek öğrenme alanlarına uygun olarak aktif üretim ve analiz (MEB-KİT kodlama, 3B modelleme vb.) için konumlandırın.
 `;
 
     const webAraclariKategorileri = `
@@ -234,11 +234,11 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
 | **Donanım** | ${sinifEkipmanlari} |
 | **Çevrim İçi Araçlar ve İçerikler** | (Öğrenci cihazı yok! Sadece öğretmenin tahtadan veya bilgisayardan açacağı araçlar/simülasyonlar) |
 | **Öğretim Materyalleri** | (sınıfta her zaman bulunan standart materyalleri yazma. Sadece bu etkinliğe özel çalışma kâğıdı, makas, yapıştırıcı vb sarf malzemeleri yaz) |
-| **Etkinlik Alanı** | (Pedagojik yaklaşıma göre sınıfı nasıl esnettiğinizi belirtin. Hangi FCL alanlarını bir arada kullandığınızı ve tekerlekli masaların durumunu belirtin.) |
+| **Etkinlik Alanı** | (Pedagojik yaklaşıma göre sınıfı nasıl esnettiğinizi belirtin. Hangi öğrenme alanlarını bir arada kullandığınızı ve tekerlekli masaların durumunu belirtin.) |
 | **Öğrencilerin Konumu** | Bireysel / Küçük Gruplar / Tüm Sınıf (Hangileri geçerliyse adlarını yaz) |
 | **Öğretmenin Rolü** | Lider / Rehber / Gözlemci (Hangileri geçerliyse adlarını yaz) |
 | **Hazırlık** | (Etkinlik başlamadan önce öğretmenin ve öğrencilerin yapması gereken ön hazırlıklar) |
-| **Uygulama (Süre: ... dk.)** | (Seçilen FCL alanlarına - ${selectedZones.join(', ')} - ve aktif öğrenme pedagojisine göre adımlar. Süre toplamı ${sure} dakikaya uymalıdır.) |
+| **Uygulama (Süre: ... dk.)** | (Seçilen öğrenme alanlarına - ${selectedZones.join(', ')} - ve aktif öğrenme pedagojisine göre adımlar. Süre toplamı ${sure} dakikaya uymalıdır.) |
 | **Etkinlik Sonu (Süre: ... dk.)** | (Etkinliğin tamamlanması, geri bildirimlerin alınması ve sınıf genel incelemesi) |
 | **Ölçme ve Değerlendirme** | (Kazanımın alt maddelerini ölçen, rehberden seçilmiş yöntemler) |
 | **Kaynakça** | (Rehbere tam uygun kaynakça) |
@@ -277,7 +277,7 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
 
 | Uygulama | Açıklamalar |
 |---|---|
-| **Öğrenme Etkinlikleri** | (Seçilen FCL alanlarına - ${selectedZones.join(', ')} - göre adımlar. Her adıma ayrılan süreyi "dk." cinsinden belirtin ve toplamın ${sure} dakikaya uymasını sağlayın. Her adımın sonuna (İlgili Beceriler: ${selected4CText}) ekle.) |
+| **Öğrenme Etkinlikleri** | (Seçilen öğrenme alanlarına - ${selectedZones.join(', ')} - göre adımlar. Her adıma ayrılan süreyi "dk." cinsinden belirtin ve toplamın ${sure} dakikaya uymasını sağlayın. Her adımın sonuna (İlgili Beceriler: ${selected4CText}) ekle.) |
 
 | Değerlendirme | Açıklamalar |
 |---|---|
@@ -297,7 +297,7 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
     }
 
     const systemPrompt = `${roleInstruction}\nDili akademik, profesyonel, anlaşılır ve Türkçe olarak kullan. Anlatımı markdown kullanarak biçimlendir.`;
-    const userPrompt = `Ders: ${ders}\nSeçilen Sınıf Seviyesi: ${sinif}. Sınıf\nÖğrenme Kazanımı: ${kazanim}\n\nÖNEMLİ KURAL: Eğer 'Öğrenme Kazanımı' metninin başında sınıf seviyesi rakamı kodlanmışsa ve seçilen sınıf seviyesi (${sinif}) ile çelişiyorsa, KESİNLİKLE kazanım kodunda yazan sınıf seviyesini esas al.\n\n${teknikPromptText}\n${mobilyaPromptText}\n${yzAracInstruction}\n${kaynakcaInstruction}\n${mufredatKurali}\n${pedagojikKurallar}\n${webAraclariKategorileri}\n${ekYonergeKurali}\nSeçilen FCL Alanları: ${selectedZones.join(', ')}\nSeçilen 4C Becerileri: ${selected4CText}\nEtkinlik Süresi: ${sure} dakika\n\nLütfen yukarıdaki yönergelere uyarak planı/senaryoyu yazınız:\n${formatInstruction}`;
+    const userPrompt = `Ders: ${ders}\nSeçilen Sınıf Seviyesi: ${sinif}. Sınıf\nÖğrenme Kazanımı: ${kazanim}\n\nÖNEMLİ KURAL: Eğer 'Öğrenme Kazanımı' metninin başında sınıf seviyesi rakamı kodlanmışsa ve seçilen sınıf seviyesi (${sinif}) ile çelişiyorsa, KESİNLİKLE kazanım kodunda yazan sınıf seviyesini esas al.\n\n${teknikPromptText}\n${mobilyaPromptText}\n${yzAracInstruction}\n${kaynakcaInstruction}\n${mufredatKurali}\n${pedagojikKurallar}\n${webAraclariKategorileri}\n${ekYonergeKurali}\nSeçilen Öğrenme Alanları: ${selectedZones.join(', ')}\nSeçilen 4C Becerileri: ${selected4CText}\nEtkinlik Süresi: ${sure} dakika\n\nLütfen yukarıdaki yönergelere uyarak planı/senaryoyu yazınız:\n${formatInstruction}`;
 
     try {
       const response = await callGeminiText(systemPrompt, userPrompt, apiKey);
@@ -602,10 +602,10 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
             💡 Yenilikçi Sınıf Eğitim Atölyesi
           </h1>
           <p className="text-slate-500 font-medium text-sm md:text-base mt-1">
-            Yapay Zeka Destekli Aktif Öğrenme Planlayıcısı ve Öğrenme Senaryosu Tasarımcısı
+            Yapay Zeka Destekli Aktif Öğrenme Planlayıcısı
           </p>
           <div className="mt-2 inline-block bg-indigo-100 text-indigo-800 px-4 py-1.5 rounded-full text-xs font-bold shadow-sm border border-indigo-200">
-            👨‍🏫 Hasan YILMAZ - Ordu İli Matematik Öğretmeni
+            👨‍🏫 Hasan YILMAZ - Matematik Öğretmeni - Ordu Yeğitek Proje Koordinatörü
           </div>
         </div>
 
@@ -650,7 +650,7 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
                 Eğitim Atölyesine Hoş Geldiniz!
               </h3>
               <p className="text-sm md:text-base text-slate-500 max-w-2xl mx-auto">
-                Aşağıdaki form aracılığıyla ders bilgilerini, kazanımları ve FCL alanlarını girerek yapay zeka destekli, Maarif Model uyumlu etkinlik planınızı veya öğrenme senaryonuzu anında tasarlayabilirsiniz.
+                Aşağıdaki form aracılığıyla ders bilgilerini, kazanımları ve öğrenme alanlarını girerek yapay zeka destekli, Maarif Model uyumlu etkinlik planınızı veya öğrenme senaryonuzu anında tasarlayabilirsiniz.
               </p>
             </div>
 
@@ -667,7 +667,7 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
                 <div className="text-xs font-extrabold text-indigo-600 mb-1">ADIM 2</div>
                 <h4 className="font-bold text-slate-800 text-sm md:text-base mb-2">Bilgileri Doldurun</h4>
                 <p className="text-xs md:text-sm text-slate-500 leading-relaxed">
-                  Ders adı, süre, sınıf seviyesi, kazanım bilgileri ile FCL alanlarını ve hedeflenen 4C becerilerini seçin.
+                  Ders adı, süre, sınıf seviyesi, kazanım bilgileri ile öğrenme alanlarını ve hedeflenen 4C becerilerini seçin.
                   </p>
               </div>
               <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 hover:border-indigo-200 hover:shadow-md transition-all">

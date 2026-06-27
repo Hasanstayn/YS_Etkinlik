@@ -164,14 +164,14 @@ export default function InputForm({
         </div>
       </div>
 
-      {/* 3. Bölüm: FCL Alanları ve Beceriler */}
+      {/* 3. Bölüm: Öğrenme Alanları ve Beceriler */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
-        {/* FCL Alanları */}
+        {/* Öğrenme Alanları */}
         <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
           <h2 className="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2">
-            📍 Esnek Öğrenme (FCL) Alanları 
+            📍 Esnek Öğrenme Alanları 
           </h2>
-          <p class="text-xs text-slate-500 mb-4">Planınızda kullanmak istediğiniz FCL alanlarını seçin.</p>
+          <p class="text-xs text-slate-500 mb-4">Planınızda kullanmak istediğiniz öğrenme alanlarını seçin.</p>
           
           <div className="grid grid-cols-3 gap-3">
             {FCL_ZONES.map((zone) => {

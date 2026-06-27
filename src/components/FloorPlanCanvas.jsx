@@ -165,12 +165,12 @@ export default function FloorPlanCanvas({ selectedZones }) {
       <div className="flex justify-between items-center border-b border-slate-200 pb-4">
         <h3 className="text-xl font-bold text-slate-800">📐 Sınıf Yerleşim Planı (2D)</h3>
         <span id="layoutTitleLabel" className="px-4 py-1.5 bg-indigo-100 text-indigo-800 rounded-full text-sm font-bold border border-indigo-200">
-          Karma FCL Düzeni
+          Karma Öğrenme Alanı Düzeni
         </span>
       </div>
       
       <p className="text-sm text-slate-500">
-        💡 FCL alanlarınızın sınıftaki dağılımı (renkli bölgeler) ve Yenilikçi Sınıf mobilyalarının yerleşimi 2D şema üzerinde gösterilmiştir.
+        💡 Öğrenme alanlarınızın sınıftaki dağılımı (renkli bölgeler) ve Yenilikçi Sınıf mobilyalarının yerleşimi 2D şema üzerinde gösterilmiştir.
       </p>
 
       <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-slate-50 p-4">
