@@ -1,6 +1,5 @@
-// src/App.jsx
 import React, { useState, useEffect } from 'react';
-import { Settings, FolderOpen, RefreshCw, X, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Settings, FolderOpen, RefreshCw, X, CheckCircle, AlertTriangle, Cloud } from 'lucide-react';
 import InputForm from './components/InputForm';
 import ResultPanel from './components/ResultPanel';
 import FloorPlanCanvas from './components/FloorPlanCanvas';
@@ -1106,6 +1105,16 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
               </span>
             )}
           </button>
+
+          <a
+            href="https://drive.google.com/drive/folders/1O3TVQP_i8sZfpBStbSlgwZk3U7kL0du3?usp=drive_link"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm active:scale-95"
+          >
+            <Cloud className="w-4.5 h-4.5 text-blue-500 animate-pulse" />
+            <span>Drive Arşivi</span>
+          </a>
 
           <button
             onClick={() => setIsSettingsOpen(true)}
