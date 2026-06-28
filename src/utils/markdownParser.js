@@ -121,6 +121,14 @@ function getStandardizedKey(key) {
     if (k.includes("beceriler") || k.includes("skills") || k.includes("fertigkeiten") || k.includes("compétences") || k.includes("المهارات")) {
         return "beceriler";
     }
+    // Değerlendirme
+    if (k.includes("değerlendirme") || k.includes("ölçme") || k.includes("assessment") || k.includes("evaluation") || k.includes("bewertung")) {
+        return "degerlendirme";
+    }
+    // Kaynakça
+    if (k.includes("kaynakça") || k.includes("kaynakca") || k.includes("referans") || k.includes("references") || k.includes("literatur") || k.includes("المراجع")) {
+        return "kaynakca";
+    }
     
     return null;
 }
@@ -217,6 +225,10 @@ export function parseGeneratedMarkdown(markdown) {
                 data.etkinlikSonu = val;
             } else if (keyType === "beceriler") {
                 data.kazanimlar += "\n\nHedeflenen Beceriler: " + val;
+            } else if (keyType === "degerlendirme") {
+                data.degerlendirme = val;
+            } else if (keyType === "kaynakca") {
+                data.kaynakca = val;
             }
         } else if (cells.length === 1) {
             const val = cells[0];
