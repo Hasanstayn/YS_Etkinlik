@@ -215,56 +215,52 @@ export default function FloorPlanCanvas({ selectedZones }) {
       if (item.type === 'desk') {
         const yOffset = -HEIGHT / 2; // -14
 
-        // 1. Draw outer wood/bezel border using the chamfered semi-octagon polygon (W_TOP = 40, W_MAX = 64, W_BOT = 32)
-        ctx.fillStyle = '#b45309'; // Warm wood edge color
-        ctx.strokeStyle = '#475569'; // Slate frame border
-        ctx.lineWidth = 1.5;
+        // 1. Draw outer frame (Darker plastic/metal bumper edge, like original photo)
+        ctx.fillStyle = '#475569'; // Slate dark grey border
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 1.0;
         ctx.beginPath();
-        ctx.moveTo(-20, -14); // Top-left
-        ctx.lineTo(20, -14);  // Top-right
-        ctx.lineTo(32, -2);   // Mid-right (widest)
-        ctx.lineTo(16, 14);   // Bottom-right
-        ctx.lineTo(-16, 14);  // Bottom-left
-        ctx.lineTo(-32, -2);  // Mid-left (widest)
+        // Geometry mirroring the 8gen outline:
+        // Top-left chamfer starting, top flat edge, top-right chamfer, 
+        // straight vertical sides, bottom chamfer tapering inwards, bottom flat edge.
+        ctx.moveTo(-16, -14); // Top edge left
+        ctx.lineTo(16, -14);  // Top edge right
+        ctx.lineTo(32, -4);   // Mid-right (widest chamfer point)
+        ctx.lineTo(32, 6);    // Vertical side straight down
+        ctx.lineTo(16, 14);   // Bottom edge right
+        ctx.lineTo(-16, 14);  // Bottom edge left
+        ctx.lineTo(-32, 6);   // Vertical side straight down
+        ctx.lineTo(-32, -4);  // Mid-left (widest chamfer point)
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
 
-        // 2. Draw inner laminate desk top surface (inset by 3px)
-        ctx.fillStyle = '#fef3c7'; // Light maple/oak surface
+        // 2. Draw inner laminate desk top surface (white/light grey as in the original photo)
+        ctx.fillStyle = '#f8fafc'; // White/light-grey laminate top
         ctx.beginPath();
-        ctx.moveTo(-18, -11); // Inset top-left
-        ctx.lineTo(18, -11);  // Inset top-right
-        ctx.lineTo(29, -2);   // Inset mid-right
-        ctx.lineTo(14, 11);   // Inset bottom-right
-        ctx.lineTo(-14, 11);  // Inset bottom-left
-        ctx.lineTo(-29, -2);  // Inset mid-left
+        ctx.moveTo(-14, -11);
+        ctx.lineTo(14, -11);
+        ctx.lineTo(29, -3);
+        ctx.lineTo(29, 4);
+        ctx.lineTo(14, 11);
+        ctx.lineTo(-14, 11);
+        ctx.lineTo(-29, 4);
+        ctx.lineTo(-29, -3);
         ctx.closePath();
         ctx.fill();
 
-        // 3. Draw a tiny notebook / tablet on the desk top
-        ctx.fillStyle = '#ffffff'; // White page
-        ctx.strokeStyle = '#cbd5e1';
-        ctx.lineWidth = 1;
+        // 3. Draw a realistic pencil/pen tray slot (The dark grey horizontal bar on the front edge as seen in the photo)
+        ctx.fillStyle = '#334155'; // Dark grey plastic tray
         ctx.beginPath();
         if (ctx.roundRect) {
-          ctx.roundRect(-8, -4, 16, 11, 2);
+          // Centered near the front edge (top flat edge)
+          ctx.roundRect(-14, -9, 28, 2.5, 1);
         } else {
-          ctx.rect(-8, -4, 16, 11);
+          ctx.rect(-14, -9, 28, 2.5);
         }
         ctx.fill();
-        ctx.stroke();
-        
-        // Draw tiny lines on notebook
-        ctx.strokeStyle = '#94a3b8';
-        ctx.beginPath();
-        ctx.moveTo(-5, -1);
-        ctx.lineTo(5, -1);
-        ctx.moveTo(-5, 2);
-        ctx.lineTo(5, 2);
-        ctx.stroke();
 
-        // 4. Draw modern student chair (with wheels/five spokes)
+        // 4. Draw modern student chair (Dark grey, matching the black/grey chairs in the photo)
         const chairX = 0;
         const chairY = 26; // Chair placed at the bottom edge (y = 14 + 12 = 26)
         
@@ -279,8 +275,8 @@ export default function FloorPlanCanvas({ selectedZones }) {
           ctx.stroke();
         }
 
-        // Draw chair seat
-        drawChair(ctx, chairX, chairY, '#ea580c', '#c2410c');
+        // Draw chair seat (Dark charcoal grey to match original photo)
+        drawChair(ctx, chairX, chairY, '#334155', '#1e293b');
       } 
       else if (item.type === 'pcDesk') {
         // PC Desk
