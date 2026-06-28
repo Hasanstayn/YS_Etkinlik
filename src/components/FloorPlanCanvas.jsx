@@ -1,6 +1,6 @@
 // src/components/FloorPlanCanvas.jsx
 import React, { useRef, useEffect, useState } from 'react';
-import { RotateCw, Trash2, PlusCircle, RefreshCw, Download, Layers } from 'lucide-react';
+import { RotateCw, Trash2, PlusCircle, RefreshCw, Download, Layers, Unlink } from 'lucide-react';
 
 export default function FloorPlanCanvas({ selectedZones }) {
   const canvasRef = useRef(null);
@@ -482,12 +482,30 @@ export default function FloorPlanCanvas({ selectedZones }) {
 
     if (foundItem) {
       setSelectedId(foundItem.id);
-      dragRef.current = {
-        id: foundItem.id,
-        isRotating: false,
-        offsetX: x - foundItem.x,
-        offsetY: y - foundItem.y
-      };
+      
+      if (foundItem.groupId) {
+        // Group drag: calculate initial offsets for all items in the group
+        const groupItems = items.filter(item => item.groupId === foundItem.groupId);
+        const offsets = groupItems.map(item => ({
+          id: item.id,
+          offsetX: x - item.x,
+          offsetY: y - item.y
+        }));
+        dragRef.current = {
+          id: foundItem.id,
+          isRotating: false,
+          isGroup: true,
+          offsets
+        };
+      } else {
+        dragRef.current = {
+          id: foundItem.id,
+          isRotating: false,
+          isGroup: false,
+          offsetX: x - foundItem.x,
+          offsetY: y - foundItem.y
+        };
+      }
       if (e.cancelable) e.preventDefault();
     } else {
       setSelectedId(null);
@@ -518,8 +536,23 @@ export default function FloorPlanCanvas({ selectedZones }) {
           return item;
         })
       );
+    } else if (dragRef.current.isGroup) {
+      // Drag group movement logic
+      const { offsets } = dragRef.current;
+      setItems(prevItems => 
+        prevItems.map(item => {
+          const match = offsets.find(o => o.id === item.id);
+          if (match) {
+            // Clamp inside canvas boundaries
+            const nx = Math.max(30, Math.min(canvasRef.current.width - 30, x - match.offsetX));
+            const ny = Math.max(30, Math.min(canvasRef.current.height - 30, y - match.offsetY));
+            return { ...item, x: nx, y: ny };
+          }
+          return item;
+        })
+      );
     } else {
-      // Drag position movement logic
+      // Drag single position movement logic
       const { id, offsetX, offsetY } = dragRef.current;
       setItems(prevItems => 
         prevItems.map(item => {
@@ -566,6 +599,23 @@ export default function FloorPlanCanvas({ selectedZones }) {
     setSelectedId(null);
   };
 
+  const handleUngroup = () => {
+    if (!selectedId) return;
+    const item = items.find(i => i.id === selectedId);
+    if (!item || !item.groupId) return;
+    
+    // Remove groupId from all items that belong to the same group
+    setItems(prev =>
+      prev.map(i => {
+        if (i.groupId === item.groupId) {
+          const { groupId, ...rest } = i;
+          return rest;
+        }
+        return i;
+      })
+    );
+  };
+
   const handleAddItem = (type) => {
     const canvas = canvasRef.current;
     const cx = canvas ? canvas.width / 2 : 450;
@@ -588,6 +638,7 @@ export default function FloorPlanCanvas({ selectedZones }) {
     const cy = canvas ? canvas.height / 2 : 300;
     const newGroupItems = [];
     const timestamp = Date.now();
+    const groupId = `group_${groupType}_${timestamp}`;
 
     if (groupType === 'hex') {
       // 6 modular desks in a hexagon (W_MAX = 64, H = 28)
@@ -601,7 +652,8 @@ export default function FloorPlanCanvas({ selectedZones }) {
           type: 'desk',
           x: cx + R * Math.cos(rad),
           y: cy + R * Math.sin(rad),
-          rotation: (angle - 90 + 360) % 360 // Oriented so chairs are on the outside, facing inwards
+          rotation: (angle - 90 + 360) % 360, // Oriented so chairs are on the outside, facing inwards
+          groupId
         });
       }
     } else if (groupType === 'octagon') {
@@ -616,7 +668,8 @@ export default function FloorPlanCanvas({ selectedZones }) {
           type: 'desk',
           x: cx + R * Math.cos(rad),
           y: cy + R * Math.sin(rad),
-          rotation: (angle - 90 + 360) % 360 // Oriented so chairs are on the outside, facing inwards
+          rotation: (angle - 90 + 360) % 360, // Oriented so chairs are on the outside, facing inwards
+          groupId
         });
       }
     } else if (groupType === 'tri') {
@@ -631,25 +684,26 @@ export default function FloorPlanCanvas({ selectedZones }) {
           type: 'desk',
           x: cx + R * Math.cos(rad),
           y: cy + R * Math.sin(rad),
-          rotation: (angle - 90 + 360) % 360 // Oriented so chairs are on the outside, facing inwards
+          rotation: (angle - 90 + 360) % 360, // Oriented so chairs are on the outside, facing inwards
+          groupId
         });
       }
     } else if (groupType === 'double') {
       // 2 modular desks facing each other (rectangle block)
-      newGroupItems.push({ id: `desk_double_${timestamp}_0`, type: 'desk', x: cx, y: cy - 14, rotation: 180 });
-      newGroupItems.push({ id: `desk_double_${timestamp}_1`, type: 'desk', x: cx, y: cy + 14, rotation: 0 });
+      newGroupItems.push({ id: `desk_double_${timestamp}_0`, type: 'desk', x: cx, y: cy - 14, rotation: 180, groupId });
+      newGroupItems.push({ id: `desk_double_${timestamp}_1`, type: 'desk', x: cx, y: cy + 14, rotation: 0, groupId });
     } else if (groupType === 'quad') {
       // 4-person block (two double desks side-by-side, spaced by 54px horizontally to avoid overlap)
-      newGroupItems.push({ id: `desk_quad_${timestamp}_0`, type: 'desk', x: cx - 27, y: cy - 14, rotation: 180 });
-      newGroupItems.push({ id: `desk_quad_${timestamp}_1`, type: 'desk', x: cx - 27, y: cy + 14, rotation: 0 });
-      newGroupItems.push({ id: `desk_quad_${timestamp}_2`, type: 'desk', x: cx + 27, y: cy - 14, rotation: 180 });
-      newGroupItems.push({ id: `desk_quad_${timestamp}_3`, type: 'desk', x: cx + 27, y: cy + 14, rotation: 0 });
+      newGroupItems.push({ id: `desk_quad_${timestamp}_0`, type: 'desk', x: cx - 27, y: cy - 14, rotation: 180, groupId });
+      newGroupItems.push({ id: `desk_quad_${timestamp}_1`, type: 'desk', x: cx - 27, y: cy + 14, rotation: 0, groupId });
+      newGroupItems.push({ id: `desk_quad_${timestamp}_2`, type: 'desk', x: cx + 27, y: cy - 14, rotation: 180, groupId });
+      newGroupItems.push({ id: `desk_quad_${timestamp}_3`, type: 'desk', x: cx + 27, y: cy + 14, rotation: 0, groupId });
     } else if (groupType === 'zigzag') {
       // 4-person zigzag row (alternating side-by-side, spaced by 54px horizontally to avoid overlap)
-      newGroupItems.push({ id: `desk_zig_${timestamp}_0`, type: 'desk', x: cx - 81, y: cy + 14, rotation: 0 });
-      newGroupItems.push({ id: `desk_zig_${timestamp}_1`, type: 'desk', x: cx - 27, y: cy - 14, rotation: 180 });
-      newGroupItems.push({ id: `desk_zig_${timestamp}_2`, type: 'desk', x: cx + 27, y: cy + 14, rotation: 0 });
-      newGroupItems.push({ id: `desk_zig_${timestamp}_3`, type: 'desk', x: cx + 81, y: cy - 14, rotation: 180 });
+      newGroupItems.push({ id: `desk_zig_${timestamp}_0`, type: 'desk', x: cx - 81, y: cy + 14, rotation: 0, groupId });
+      newGroupItems.push({ id: `desk_zig_${timestamp}_1`, type: 'desk', x: cx - 27, y: cy - 14, rotation: 180, groupId });
+      newGroupItems.push({ id: `desk_zig_${timestamp}_2`, type: 'desk', x: cx + 27, y: cy + 14, rotation: 0, groupId });
+      newGroupItems.push({ id: `desk_zig_${timestamp}_3`, type: 'desk', x: cx + 81, y: cy - 14, rotation: 180, groupId });
     }
 
     setItems(prev => [...prev, ...newGroupItems]);
@@ -739,6 +793,22 @@ export default function FloorPlanCanvas({ selectedZones }) {
                     <RotateCw className="w-3.5 h-3.5" />
                     <span>Döndür</span>
                   </button>
+                  {(() => {
+                    const selItem = items.find(i => i.id === selectedId);
+                    if (selItem && selItem.groupId) {
+                      return (
+                        <button
+                          onClick={handleUngroup}
+                          className="flex items-center gap-1 px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-lg text-xs font-bold transition-all"
+                          title="Bu grubu dağıtarak masaları bağımsız hale getirir"
+                        >
+                          <Unlink className="w-3.5 h-3.5" />
+                          <span>Grubu Dağıt</span>
+                        </button>
+                      );
+                    }
+                    return null;
+                  })()}
                   <button
                     onClick={handleDelete}
                     className="flex items-center gap-1 px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-800 rounded-lg text-xs font-bold transition-all"
