@@ -153,25 +153,32 @@ export default function App() {
     setLoadingStep(1);
 
     const stepTimeouts = [];
-    const scheduleStep = (step, delay) => {
-      const t = setTimeout(() => {
-        setLoadingStep(step);
-      }, delay);
-      stepTimeouts.push(t);
-    };
+    const targetLangName = 
+      belgeDili === 'en' ? 'English' :
+      belgeDili === 'de' ? 'German' :
+      belgeDili === 'fr' ? 'French' :
+      belgeDili === 'ar' ? 'Arabic' : 'Türkçe';
 
-    scheduleStep(2, 3500);  // Step 2: Pedagoji Seçimi (3.5s)
-    scheduleStep(3, 7500);  // Step 3: Süre & Aşama Hesabı (7.5s)
-    scheduleStep(4, 12000); // Step 4: Değerlendirme Tasarımı (12s)
-    scheduleStep(5, 17000); // Step 5: Kaynakça & Şablonlama (17s)
+    try {
+      const scheduleStep = (step, delay) => {
+        const t = setTimeout(() => {
+          setLoadingStep(step);
+        }, delay);
+        stepTimeouts.push(t);
+      };
 
-    // Smooth scroll to loading card
-    setTimeout(() => {
-      const loadCard = document.getElementById('loadingSection');
-      if (loadCard) {
-        loadCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }, 100);
+      scheduleStep(2, 3500);  // Step 2: Pedagoji Seçimi (3.5s)
+      scheduleStep(3, 7500);  // Step 3: Süre & Aşama Hesabı (7.5s)
+      scheduleStep(4, 12000); // Step 4: Değerlendirme Tasarımı (12s)
+      scheduleStep(5, 17000); // Step 5: Kaynakça & Şablonlama (17s)
+
+      // Smooth scroll to loading card
+      setTimeout(() => {
+        const loadCard = document.getElementById('loadingSection');
+        if (loadCard) {
+          loadCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
 
     const sinifNum = parseInt(sinif);
     const kademeText = (sinifNum >= 5 && sinifNum <= 8) ? "Temel Eğitim" : "Ortaöğretim";
@@ -780,7 +787,6 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
     const systemPrompt = `${roleInstruction}\nDili akademik, profesyonel, anlaşılır and ${targetLangName} olarak kullan. Anlatımı markdown kullanarak biçimlendir.`;
     const userPrompt = `Ders: ${ders}\nSeçilen Sınıf Seviyesi: ${sinif}. Sınıf\nÖğrenme Kazanımı: ${kazanim}\n\nÖNEMLİ KURAL: Eğer 'Öğrenme Kazanımı' metninin başında sınıf seviyesi rakamı kodlanmışsa ve seçilen sınıf seviyesi (${sinif}) ile çelişiyorsa, KESİNLİKLE kazanım kodunda yazan sınıf seviyesini esas al.\n\n${teknikPromptText}\n${mobilyaPromptText}\n${yzAracInstruction}\n${kaynakcaInstruction}\n${mufredatKurali}\n${pedagojikKurallar}\n${webAraclariKategorileri}\n${ekYonergeKurali}\nSeçilen Öğrenme Alanları: ${selectedZones.join(', ')}\nSeçilen 4C Becerileri: ${selected4CText}\nEtkinlik Süresi: ${sure} dakika\n\nLütfen yukarıdaki yönergelere uyarak planı/senaryoyu yazınız:\n${formatInstruction}`;
 
-    try {
       const response = await callGeminiText(systemPrompt, userPrompt, apiKey);
       setLastResponseText(response);
       
