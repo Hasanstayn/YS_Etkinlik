@@ -1235,9 +1235,19 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
                   <RefreshCw className="w-8 h-8" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-black text-slate-800">Yapay Zeka Tasarım Yapıyor...</h3>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    Pedagojik rehberler ve Türkiye Yüzyılı Maarif Modeli kriterleri işleniyor.
+                  <h3 className="text-lg font-black text-indigo-950">
+                    {loadingStep === 1 && "Müfredat Analizi Yapılıyor..."}
+                    {loadingStep === 2 && "Pedagojik Yaklaşım Seçiliyor..."}
+                    {loadingStep === 3 && "Süre & İstasyon Planlaması Yapılıyor..."}
+                    {loadingStep === 4 && "Değerlendirme Kriterleri Tasarlanıyor..."}
+                    {loadingStep >= 5 && "Dosya Hazırlanıyor ve Tamamlanıyor..."}
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    {loadingStep === 1 && "Kazanımlar ve sınıf seviyesi standartları inceleniyor..."}
+                    {loadingStep === 2 && "Aktif öğrenme teknikleri ve 4C becerileri entegre ediliyor..."}
+                    {loadingStep === 3 && "Öğrenme alanlarına göre zaman dağılımı hesaplanıyor..."}
+                    {loadingStep === 4 && "Öz değerlendirme formları ve rubrikler hazırlanıyor..."}
+                    {loadingStep >= 5 && "Belge şablonu oluşturuluyor, yapay zekanın yanıtı tamamlanıyor (lütfen bekleyin)..."}
                   </p>
                 </div>
               </div>

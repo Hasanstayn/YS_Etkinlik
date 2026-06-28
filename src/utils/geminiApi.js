@@ -19,9 +19,9 @@ export async function callGeminiText(systemText, userText, apiKey, retryCount = 
         systemInstruction: { parts: [{ text: systemText }] } 
     };
     
-    // 20-second timeout using AbortController
+    // 35-second timeout using AbortController (ample time for generating long templates)
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 20000);
+    const timeoutId = setTimeout(() => controller.abort(), 35000);
     
     try {
         const response = await fetch(url, { 
@@ -35,13 +35,23 @@ export async function callGeminiText(systemText, userText, apiKey, retryCount = 
         
         if (!response.ok) {
             let errMsg = `HTTP Hatası: ${response.status}`;
+            let isRetryable = true;
+            
+            // Client errors like 400 (Bad Request/Invalid Key) or 403 (Forbidden) are not retryable
+            if (response.status === 400 || response.status === 403) {
+                isRetryable = false;
+            }
+            
             try {
                 const errJson = await response.json();
                 if (errJson.error && errJson.error.message) {
                     errMsg = errJson.error.message;
                 }
             } catch(e) {}
-            throw new Error(errMsg);
+            
+            const error = new Error(errMsg);
+            error.isRetryable = isRetryable;
+            throw error;
         }
         
         const result = await response.json();
@@ -55,6 +65,11 @@ export async function callGeminiText(systemText, userText, apiKey, retryCount = 
             : error.message;
             
         console.warn(`Gemini API Try #${retryCount + 1} (${modelName}) failed: ${errMessage}`);
+
+        // If the error is explicitly marked as non-retryable (like 400/403), throw it immediately
+        if (error.isRetryable === false) {
+            throw new Error(errMessage);
+        }
 
         if (retryCount < 3) {
             // Wait 1.5 seconds and retry with fallback model
