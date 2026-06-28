@@ -687,23 +687,37 @@ DİKKAT: Kaynakça tablosunun içine sadece düz metin kaynakları yaz. Çevrim 
 "Ünite/Tema/Öğrenme Alanı" ve "Konu/İçerik Çerçevesi" bölümlerini kesinlikle uydurmayın veya genel geçer şekilde doldurmayın. Öğretmenin girdiği "Ders" (Örn: Matematik, Temel Matematik, Matematik Uygulamaları, Fen Bilimleri, Fizik, Kimya, Biyoloji, Türkçe, Türk Dili ve Edebiyatı, Sosyal Bilgiler, Tarih, T.C. İnkılap Tarihi ve Atatürkçülük, Coğrafya, Felsefe vb.), "Sınıf Seviyesi" ve "Kazanım" bilgilerini analiz edin. 
 Bu bilgileri MEB'in güncel Türkiye Yüzyılı Maarif Modeli öğretim programları ile eşleştirerek, tam ve doğru "Öğrenme Alanı/Tema/Ünite" adını ve "Konu/İçerik Çerçevesi"ni tespit edip tablodaki ilgili alanlara yazın.
 `;
+      // Constructing tools list dynamically based on choices
+      let kodlamaAraclari = [];
+      if (useMebKit) {
+        kodlamaAraclari.push("MEB-KİT Simülatörü", "Scratch");
+      }
+      if (use3DPrinter) {
+        kodlamaAraclari.push("Tinkercad");
+      }
+      if (kodlamaAraclari.length === 0) {
+        kodlamaAraclari.push("EBA Etkileşimli İçerikler", "Canva");
+      }
+
       pedagojikKurallar = `
 PEDAGOJİK VE METODOLOJİK KURALLAR:
 1. Rol Tanımları: Öğrenciler aktif araştırmacı, öğretmen ise rehberdir. Geleneksel düz anlatımı tamamen ortadan kaldırın.
 2. 4C Entegrasyonu: Her adımda öğrencilerin İletişim, İş Birliği, Eleştirel Düşünme ve Yaratıcılık becerilerini nasıl sergilediğini açıklayın.
-3. Teknolojinin Rolü: Teknolojiyi sadece sunum veya tüketim için değil, esnek öğrenme alanlarına uygun olarak aktif üretim ve analiz (${useMebKit ? 'MEB-KİT kodlama, ' : ''}3B modelleme ${use3DPrinter ? '(3B Yazıcı baskısı dahil)' : '(sadece ekran üzerinde dijital modelleme, fiziksel baskı KESİNLİKLE önermeyin!)'}, Scratch vb.) için konumlandırın. ${useMebKit ? '' : 'KESİNLİKLE MEB-KİT (veya MEB KİT) kullanımını önermeyin/tavsiye etmeyin.'} ${use3DPrinter ? '' : 'KESİNLİKLE fiziksel 3B Yazıcı (3D Printer) cihazı kullanımı veya baskı almayı önermeyin.'}
+3. Teknolojinin Rolü: Teknolojiyi sadece sunum veya tüketim için değil, esnek öğrenme alanlarına uygun olarak aktif üretim ve analiz için konumlandırın.
+${useMebKit ? '- MEB-KİT Kodlama ve devre tasarımlarını (Scratch tabanlı) etkinliğe entegre edebilirsiniz.' : '- KESİNLİKLE MEB-KİT (veya MEB KİT) kullanımı, kodlaması, devre tasarımı veya Scratch tabanlı elektronik kodlama önermeyin/yazmayın.'}
+${use3DPrinter ? '- 3B Tasarım/Modelleme (Tinkercad vb.) ve 3B Yazıcıdan fiziksel baskı almayı etkinliğe entegre edebilirsiniz.' : '- KESİNLİKLE 3B (3 boyutlu) tasarım, 3B modelleme, Tinkercad kullanımı veya 3B Yazıcıdan baskı almayı önermeyin/yazmayın.'}
 `;
       webAraclariKategorileri = `
 KATEGORİLERE GÖRE TAVSİYE EDİLEN YAPAY ZEKA VE WEB 2.0 ARAÇLARI:
 - Bilgi Toplama/Araştırma: Perplexity, Google Akademik, EBA
 - İş Birliği/Geri Bildirim: Padlet, Mentimeter, Miro
-- İçerik Geliştirme/Kodlama: ${useMebKit ? 'MEB-KİT Simülatörü, ' : ''}Tinkercad, Scratch ${useMebKit ? '' : '(MEB-KİT KESİNLİKLE önerilmemelidir!)'}
+- İçerik Geliştirme/Kodlama: ${kodlamaAraclari.join(', ')}
 - Üretim/Medya Tasarımı: Canva, CapCut, Adobe Express
 - Sunum/Etkileşim: Genially, Prezi, Kahoot
 `;
       ekYonergeKurali = `
-ÖNEMLİ YÖNERGE KURALI (${useMebKit ? 'MEB-KİT, ' : ''}${use3DPrinter ? '3B Yazıcı, ' : ''}ve Kategori Dışı Araçlar İçin):
-Eğer senaryoda ${useMebKit ? '"MEB-KİT", ' : ''}${use3DPrinter ? '"3B Yazıcı", ' : ''}veya yukarıdaki listelerde bulunmayan farklı ve karmaşık bir çevrim içi araç kullanılıyorsa, EKLER bölümüne KESİNLİKLE detaylı bir "Uygulama Yönergesi" tablosu ekleyin. ${useMebKit ? 'Devre bağlantıları, pin yapılandırmaları veya ' : ''}${use3DPrinter ? '3D baskı (slicing) ayarlarını ' : ''}adım adım belirtin. ${useMebKit ? '' : 'KESİNLİKLE MEB-KİT (veya MEB KİT) önermeyin ve buna dair bir yönerge eklemeyin.'} ${use3DPrinter ? '' : 'KESİNLİKLE 3B Yazıcı (3D Printer) önermeyin ve 3D baskı dilimleme (slicing) yönergesi eklemeyin.'}
+ÖNEMLİ YÖNERGE KURALI:
+${useMebKit || use3DPrinter ? `Eğer senaryoda ${useMebKit ? '"MEB-KİT" ' : ''}${use3DPrinter ? '"3B Yazıcı" ' : ''}kullanılıyorsa, EKLER bölümüne KESİNLİKLE detaylı bir "Uygulama Yönergesi" tablosu ekleyin (${useMebKit ? 'devre bağlantıları, pin yapılandırmaları ' : ''}${use3DPrinter ? 'veya 3D baskı slicing ayarları' : ''}).` : 'Senaryoda MEB-KİT veya 3B Yazıcı kullanılmadığı için EKLER bölümüne KESİNLİKLE devre bağlantı şemaları veya 3D baskı slicing tabloları eklemeyin. Ekler bölümünde sadece dersin kazanımına uygun çalışma kağıdı şablonları veya rubrik değerlendirme ölçekleri paylaşın.'}
 `;
 
       if (belgeTuru === "etkinlikPlani") {
