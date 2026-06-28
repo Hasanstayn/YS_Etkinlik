@@ -213,12 +213,13 @@ export default function FloorPlanCanvas({ selectedZones }) {
       const isSelected = item.id === selectedId;
 
       if (item.type === 'desk') {
-        // Draw trapezoid table
-        ctx.fillStyle = '#f8fafc';
-        ctx.strokeStyle = '#475569';
-        ctx.lineWidth = 2.5;
-        ctx.beginPath();
         const yOffset = -HEIGHT / 2;
+
+        // 1. Draw outer wood/bezel border
+        ctx.fillStyle = '#b45309'; // Warm wood edge color
+        ctx.strokeStyle = '#475569'; // Slate frame border
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
         ctx.moveTo(-LONG_BASE / 2, yOffset + HEIGHT);
         ctx.lineTo(LONG_BASE / 2, yOffset + HEIGHT);
         ctx.lineTo(SHORT_BASE / 2, yOffset);
@@ -227,19 +228,90 @@ export default function FloorPlanCanvas({ selectedZones }) {
         ctx.fill();
         ctx.stroke();
 
-        // Draw orange chair at the long base side
-        drawChair(ctx, 0, yOffset + HEIGHT + 12, '#ea580c', '#c2410c');
+        // 2. Draw inner laminate desk top surface (inset by 3px)
+        const inset = 3;
+        const scaleX = (LONG_BASE - inset * 2) / LONG_BASE;
+        const scaleY = (HEIGHT - inset * 2) / HEIGHT;
+        
+        ctx.fillStyle = '#fef3c7'; // Light maple/oak surface
+        ctx.beginPath();
+        const iyOffset = - (HEIGHT - inset*2) / 2;
+        const iLong = LONG_BASE / 2 - inset * 1.5;
+        const iShort = SHORT_BASE / 2 - inset * 0.7;
+        ctx.moveTo(-iLong, iyOffset + HEIGHT - inset*2);
+        ctx.lineTo(iLong, iyOffset + HEIGHT - inset*2);
+        ctx.lineTo(iShort, iyOffset);
+        ctx.lineTo(-iShort, iyOffset);
+        ctx.closePath();
+        ctx.fill();
+
+        // 3. Draw a tiny notebook / tablet on the desk top
+        ctx.fillStyle = '#ffffff'; // White page
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        if (ctx.roundRect) {
+          ctx.roundRect(-8, yOffset + 10, 16, 11, 2);
+        } else {
+          ctx.rect(-8, yOffset + 10, 16, 11);
+        }
+        ctx.fill();
+        ctx.stroke();
+        
+        // Draw tiny lines on notebook
+        ctx.strokeStyle = '#94a3b8';
+        ctx.beginPath();
+        ctx.moveTo(-5, yOffset + 13);
+        ctx.lineTo(5, yOffset + 13);
+        ctx.moveTo(-5, yOffset + 16);
+        ctx.lineTo(5, yOffset + 16);
+        ctx.stroke();
+
+        // 4. Draw modern student chair (with wheels/five spokes)
+        const chairX = 0;
+        const chairY = yOffset + HEIGHT + 12;
+        
+        // Draw 5-star base of chair
+        ctx.strokeStyle = '#475569';
+        ctx.lineWidth = 1.5;
+        for (let a = 0; a < 5; a++) {
+          const angle = (a * 2 * Math.PI) / 5 + Math.PI / 2;
+          ctx.beginPath();
+          ctx.moveTo(chairX, chairY);
+          ctx.lineTo(chairX + Math.cos(angle) * 7, chairY + Math.sin(angle) * 7);
+          ctx.stroke();
+        }
+
+        // Draw chair seat
+        drawChair(ctx, chairX, chairY, '#ea580c', '#c2410c');
       } 
       else if (item.type === 'pcDesk') {
         // PC Desk
-        drawRect(ctx, -30, -20, 60, 40, '#f1f5f9', '', '#94a3b8');
+        drawRect(ctx, -30, -20, 60, 40, '#edd4b2', '', '#854d0e'); // Wooden frame
+        drawRect(ctx, -27, -17, 54, 34, '#f8fafc'); // White top inlay
+        
         // Screen
-        drawRect(ctx, -20, -15, 40, 8, '#0f172a');
+        drawRect(ctx, -20, -12, 40, 6, '#0f172a');
+        
         // Keyboard
-        ctx.fillStyle = '#94a3b8';
-        ctx.fillRect(-15, 0, 30, 8);
+        ctx.fillStyle = '#475569';
+        ctx.fillRect(-15, -2, 30, 7);
+        
+        // Chair base spokes
+        const chairX = 0;
+        const chairY = 32;
+        ctx.strokeStyle = '#475569';
+        ctx.lineWidth = 1.5;
+        for (let a = 0; a < 5; a++) {
+          const angle = (a * 2 * Math.PI) / 5 + Math.PI / 2;
+          ctx.beginPath();
+          ctx.moveTo(chairX, chairY);
+          ctx.lineTo(chairX + Math.cos(angle) * 7, chairY + Math.sin(angle) * 7);
+          ctx.stroke();
+        }
+        
         // Chair
-        drawChair(ctx, 0, 32, '#facc15', '#ca8a04');
+        drawChair(ctx, chairX, chairY, '#facc15', '#ca8a04');
       } 
       else if (item.type === 'pouf') {
         // Square Pouf
@@ -262,25 +334,77 @@ export default function FloorPlanCanvas({ selectedZones }) {
       } 
       else if (item.type === 'teacherDesk') {
         // Teacher Desk
-        drawRect(ctx, -40, -20, 80, 40, '#f8fafc', 'Öğretmen', '#cbd5e1');
-        drawChair(ctx, 0, 32, '#475569', '#334155');
+        drawRect(ctx, -40, -20, 80, 40, '#854d0e', '', '#451a03'); // Mahogany finish
+        drawRect(ctx, -36, -16, 72, 32, '#edd4b2'); // Wooden veneer inlay
+        
+        // Laptop
+        drawRect(ctx, -15, -8, 30, 16, '#334155', '', '#1e293b'); // Dark keyboard base
+        drawRect(ctx, -15, -12, 30, 4, '#94a3b8'); // Screen hinge area
+        
+        // Notebook / Document
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(18, -6, 12, 16);
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.strokeRect(18, -6, 12, 16);
+        
+        // Cup of coffee
+        ctx.fillStyle = '#78350f'; // Coffee brown
+        ctx.beginPath();
+        ctx.arc(-24, 0, 4, 0, Math.PI*2);
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff'; // White cup edge
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Chair base spokes
+        const chairX = 0;
+        const chairY = 32;
+        ctx.strokeStyle = '#475569';
+        ctx.lineWidth = 1.5;
+        for (let a = 0; a < 5; a++) {
+          const angle = (a * 2 * Math.PI) / 5 + Math.PI / 2;
+          ctx.beginPath();
+          ctx.moveTo(chairX, chairY);
+          ctx.lineTo(chairX + Math.cos(angle) * 7, chairY + Math.sin(angle) * 7);
+          ctx.stroke();
+        }
+
+        // Chair
+        drawChair(ctx, chairX, chairY, '#475569', '#334155');
       } 
       else if (item.type === 'printerTable') {
         // 3D Printer Table
-        drawRect(ctx, -50, -30, 100, 60, '#f1f5f9', '', '#94a3b8');
+        drawRect(ctx, -50, -30, 100, 60, '#edd4b2', '', '#854d0e'); // Wooden printer table frame
+        drawRect(ctx, -46, -26, 92, 52, '#f8fafc'); // White surface inlay
+        
         // Filament Spool
-        ctx.fillStyle = '#22c55e';
+        ctx.fillStyle = '#ef4444'; // Red filament spool
         ctx.beginPath();
         ctx.arc(-30, -5, 12, 0, Math.PI*2);
         ctx.fill();
-        ctx.fillStyle = '#f1f5f9';
+        ctx.fillStyle = '#f8fafc';
         ctx.beginPath();
         ctx.arc(-30, -5, 5, 0, Math.PI*2);
         ctx.fill();
+        
         // Printer Unit
-        drawRect(ctx, -10, -20, 45, 40, '#0f172a', '3B YAZICI', '#1e293b');
+        drawRect(ctx, -10, -20, 45, 40, '#1e293b', '3B YAZICI', '#0f172a');
+        
+        // Chair base spokes
+        const chairX = 0;
+        const chairY = 45;
+        ctx.strokeStyle = '#475569';
+        ctx.lineWidth = 1.5;
+        for (let a = 0; a < 5; a++) {
+          const angle = (a * 2 * Math.PI) / 5 + Math.PI / 2;
+          ctx.beginPath();
+          ctx.moveTo(chairX, chairY);
+          ctx.lineTo(chairX + Math.cos(angle) * 7, chairY + Math.sin(angle) * 7);
+          ctx.stroke();
+        }
+        
         // Yellow Chair
-        drawChair(ctx, 0, 45, '#facc15', '#ca8a04');
+        drawChair(ctx, chairX, chairY, '#facc15', '#ca8a04');
       }
 
       // Draw Selected Highlight
