@@ -937,7 +937,7 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
 
     try {
       showToast("Word belgesi hazırlanıyor...", "success");
-      await downloadDocx(lastResponseText, renderedHtml, filename);
+      await downloadDocx(lastResponseText, renderedHtml, filename, { selectedZones, sure });
     } catch (e) {
       console.error(e);
       showToast(e.message, "error");
@@ -1053,7 +1053,7 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
     showToast("Dosya Google Drive'a yükleniyor...", "success");
 
     try {
-      const blob = await generateDocxBlob(lastResponseText, renderedHtml);
+      const blob = await generateDocxBlob(lastResponseText, renderedHtml, { selectedZones, sure });
       
       // Convert blob to base64
       const reader = new FileReader();

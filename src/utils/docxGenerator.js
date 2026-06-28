@@ -2,7 +2,9 @@
 import JSZip from 'jszip';
 import { parseGeneratedMarkdown } from './markdownParser';
 
-export async function generateDocxBlob(lastResponseText, renderedHtmlContent) {
+export async function generateDocxBlob(lastResponseText, renderedHtmlContent, options = {}) {
+    const { selectedZones = [], sure = "40" } = options;
+
     // 1. Fetch template from public folder
     const templateUrl = `${import.meta.env.BASE_URL}docx_template.docx`;
     const response = await fetch(templateUrl);
@@ -110,11 +112,18 @@ export async function generateDocxBlob(lastResponseText, renderedHtmlContent) {
         return p;
     }
 
+    // Dynamic duration calculations
+    const totalSure = parseInt(sure || data.sure || "40", 10) || 40;
+    const evalSure = 10;
+    const guideSure = Math.max(0, totalSure - evalSure);
+    const sonuSure = guideSure > 35 ? 10 : 5;
+    const uygulamaSure = Math.max(0, guideSure - sonuSure);
+
     // Fill standard cells
     fillCell(0, 1, data.etkinlikId || "ETK-01");
     fillCell(1, 1, data.baslik || "", true);
     fillCell(2, 1, data.genelBakis || "");
-    fillCell(3, 1, data.sure || "");
+    fillCell(3, 1, `${totalSure} Dakika`);
     fillCell(4, 2, data.kademe || "");
     fillCell(5, 2, data.sinifSeviyesi || "");
     fillCell(6, 2, data.dersAdi || "");
@@ -124,22 +133,27 @@ export async function generateDocxBlob(lastResponseText, renderedHtmlContent) {
     fillCell(10, 2, data.donanim || "");
     fillCell(11, 2, data.cevrimIci || "");
     fillCell(12, 2, data.ogretimMateryalleri || "");
-    fillCell(13, 3, data.etkinlikAlani || "");
     
-    // Checkboxes for student layout
+    // Etkinlik Alani: Fill with selected FCL zones instead of the AI description text
+    const activeZones = selectedZones.length > 0 ? selectedZones : (data.etkinlikAlani ? [data.etkinlikAlani] : []);
+    fillCell(13, 1, activeZones.join(", "));
+    fillCell(13, 2, "");
+    fillCell(13, 3, "");
+    
+    // Checkboxes for student layout (using standard Ballot boxes U+2612 ☒ and U+2610 ☐)
     const kon = (data.ogrencilerinKonumu || "").toLowerCase();
-    const isBireysel = kon.includes("bireysel") ? "☑ Bireysel" : "☐ Bireysel";
-    const isGrup = (kon.includes("grup") || kon.includes("ekip")) ? "☑ Küçük Gruplar" : "☐ Küçük Gruplar";
-    const isSinif = (kon.includes("sınıf") || kon.includes("tüm")) ? "☑ Tüm Sınıf" : "☐ Tüm Sınıf";
+    const isBireysel = (kon.includes("bireysel") || kon.includes("individual")) ? "☒ Bireysel" : "☐ Bireysel";
+    const isGrup = (kon.includes("grup") || kon.includes("ekip") || kon.includes("group") || kon.includes("team")) ? "☒ Küçük Gruplar" : "☐ Küçük Gruplar";
+    const isSinif = (kon.includes("sınıf") || kon.includes("tüm") || kon.includes("class") || kon.includes("whole")) ? "☒ Tüm Sınıf" : "☐ Tüm Sınıf";
     fillCell(14, 1, isBireysel);
     fillCell(14, 2, isGrup);
     fillCell(14, 3, isSinif);
     
     // Checkboxes for teacher role
     const rol = (data.ogretmeninRolü || "").toLowerCase();
-    const isLider = rol.includes("lider") ? "☑ Lider" : "☐ Lider";
-    const isRehber = rol.includes("rehber") ? "☑ Rehber" : "☐ Rehber";
-    const isGozlemci = rol.includes("gözlemci") ? "☑ Gözlemci" : "☐ Gözlemci";
+    const isLider = (rol.includes("lider") || rol.includes("leader")) ? "☒ Lider" : "☐ Lider";
+    const isRehber = (rol.includes("rehber") || rol.includes("guide") || rol.includes("facilitator")) ? "☒ Rehber" : "☐ Rehber";
+    const isGozlemci = (rol.includes("gözlemci") || rol.includes("gozlemci") || rol.includes("observer")) ? "☒ Gözlemci" : "☐ Gözlemci";
     fillCell(15, 1, isLider);
     fillCell(15, 2, isRehber);
     fillCell(15, 3, isGozlemci);
@@ -166,18 +180,12 @@ export async function generateDocxBlob(lastResponseText, renderedHtmlContent) {
         }
     }
 
-    let uygulamaSure = "";
-    let sonuSure = "";
-    const appMatch = lastResponse.match(/Uygulama\s*\(([^)]+)\)/i);
-    if (appMatch) uygulamaSure = appMatch[1];
-    else uygulamaSure = (data.sure || "60 Dakika");
-    
-    const sonuMatch = lastResponse.match(/Etkinlik\s*Sonu\s*\(([^)]+)\)/i);
-    if (sonuMatch) sonuSure = sonuMatch[1];
-    else sonuSure = "10 Dakika";
-    
-    replaceDurationInCellText(17, 1, "... dk.", uygulamaSure);
-    replaceDurationInCellText(18, 1, "... dk.", sonuSure);
+    // Apply exact mathematical duration replacements in Word table cell headers
+    replaceDurationInCellText(16, 0, "... dk.", `${guideSure} dk.`);
+    replaceDurationInCellText(17, 1, "... dk.", `${uygulamaSure} dk.`);
+    replaceDurationInCellText(18, 1, "... dk.", `${sonuSure} dk.`);
+    replaceDurationInCellText(19, 0, "... dk.", `${evalSure} dk.`);
+    replaceDurationInCellText(19, 1, "... dk.", `${evalSure} dk.`);
 
     const serializer = new XMLSerializer();
     const newXmlString = serializer.serializeToString(xmlDoc);
@@ -187,9 +195,9 @@ export async function generateDocxBlob(lastResponseText, renderedHtmlContent) {
     return await zipFile.generateAsync({ type: "blob" });
 }
 
-export async function downloadDocx(lastResponseText, renderedHtmlContent, defaultFilename = "Etkinlik_Plani.docx") {
+export async function downloadDocx(lastResponseText, renderedHtmlContent, defaultFilename = "Etkinlik_Plani.docx", options = {}) {
     try {
-        const blob = await generateDocxBlob(lastResponseText, renderedHtmlContent);
+        const blob = await generateDocxBlob(lastResponseText, renderedHtmlContent, options);
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
