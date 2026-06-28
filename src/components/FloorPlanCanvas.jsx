@@ -253,10 +253,10 @@ export default function FloorPlanCanvas({ selectedZones }) {
         ctx.fillStyle = '#334155'; // Dark grey plastic tray
         ctx.beginPath();
         if (ctx.roundRect) {
-          // Centered near the front edge (top flat edge)
-          ctx.roundRect(-14, -9, 28, 2.5, 1);
+          // Centered near the student's edge (bottom flat edge)
+          ctx.roundRect(-14, 7, 28, 2.5, 1);
         } else {
-          ctx.rect(-14, -9, 28, 2.5);
+          ctx.rect(-14, 7, 28, 2.5);
         }
         ctx.fill();
 
@@ -558,7 +558,7 @@ export default function FloorPlanCanvas({ selectedZones }) {
           type: 'desk',
           x: cx + R * Math.cos(rad),
           y: cy + R * Math.sin(rad),
-          rotation: angle + 90
+          rotation: (angle - 90 + 360) % 360 // Oriented so chairs are on the outside, facing inwards
         });
       }
     } else if (groupType === 'octagon') {
@@ -573,7 +573,7 @@ export default function FloorPlanCanvas({ selectedZones }) {
           type: 'desk',
           x: cx + R * Math.cos(rad),
           y: cy + R * Math.sin(rad),
-          rotation: angle + 90
+          rotation: (angle - 90 + 360) % 360 // Oriented so chairs are on the outside, facing inwards
         });
       }
     } else if (groupType === 'tri') {
@@ -588,7 +588,7 @@ export default function FloorPlanCanvas({ selectedZones }) {
           type: 'desk',
           x: cx + R * Math.cos(rad),
           y: cy + R * Math.sin(rad),
-          rotation: i * 120 + 30
+          rotation: (angle - 90 + 360) % 360 // Oriented so chairs are on the outside, facing inwards
         });
       }
     } else if (groupType === 'double') {
