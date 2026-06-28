@@ -1078,29 +1078,29 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
   return (
     <div className="min-h-screen bg-gradient-to-tr from-slate-50 via-slate-100 to-indigo-50/30 p-4 md:p-8 font-sans">
       {/* Top Header Row spanning full width */}
-      <header className="max-w-4xl mx-auto glass-panel rounded-3xl p-6 mb-8 bg-white shadow-md border border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
-        <div className="flex flex-col items-center md:items-start text-center md:text-left">
-          <h1 className="text-2xl md:text-3xl font-extrabold text-slate-800 tracking-tight flex items-center gap-2">
+      <header className="max-w-4xl mx-auto glass-panel rounded-3xl p-5 mb-8 bg-white shadow-md border border-slate-100 flex flex-col lg:flex-row justify-between items-center gap-4">
+        <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
+          <h1 className="text-xl md:text-2xl font-black text-slate-800 tracking-tight flex items-center gap-1.5 whitespace-nowrap">
             💡 Yenilikçi Sınıf Eğitim Atölyesi
           </h1>
-          <p className="text-slate-500 font-medium text-sm md:text-base mt-1">
+          <p className="text-slate-500 font-medium text-xs md:text-sm mt-0.5">
             Yapay Zeka Destekli Aktif Öğrenme Planlayıcısı
           </p>
-          <div className="mt-2 inline-block bg-indigo-100 text-indigo-800 px-4 py-1.5 rounded-full text-xs font-bold shadow-sm border border-indigo-200">
+          <div className="mt-1.5 inline-block bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-[10px] md:text-xs font-bold border border-indigo-100 shadow-sm">
             👨‍🏫 Hasan YILMAZ - Matematik Öğretmeni - Ordu Yeğitek Proje Koordinatörü
           </div>
         </div>
 
-        {/* Buttons (Saved Scenarios & API settings) */}
-        <div className="flex flex-wrap gap-3 items-center">
+        {/* Buttons (Saved Scenarios, Drive archive & API settings) */}
+        <div className="flex flex-wrap items-center justify-center gap-2">
           <button
             onClick={() => setIsSavedOpen(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm active:scale-95"
+            className="flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm active:scale-95 whitespace-nowrap"
           >
-            <FolderOpen className="w-4 h-4 text-indigo-500" />
+            <FolderOpen className="w-3.5 h-3.5 text-indigo-500" />
             <span>Kayıtlı Senaryolar</span>
             {savedScenarios.length > 0 && (
-              <span className="bg-indigo-600 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center font-bold">
+              <span className="bg-indigo-600 text-white rounded-full text-[9px] w-4.5 h-4.5 flex items-center justify-center font-bold">
                 {savedScenarios.length}
               </span>
             )}
@@ -1110,17 +1110,17 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
             href="https://drive.google.com/drive/folders/1O3TVQP_i8sZfpBStbSlgwZk3U7kL0du3?usp=drive_link"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm active:scale-95"
+            className="flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm active:scale-95 whitespace-nowrap"
           >
-            <Cloud className="w-4.5 h-4.5 text-blue-500 animate-pulse" />
+            <Cloud className="w-4 h-4 text-blue-500 animate-pulse" />
             <span>Drive Arşivi</span>
           </a>
 
           <button
             onClick={() => setIsSettingsOpen(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm active:scale-95"
+            className="flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm active:scale-95 whitespace-nowrap"
           >
-            <Settings className="w-4 h-4 text-indigo-500" />
+            <Settings className="w-3.5 h-3.5 text-indigo-500" />
             <span>API Ayarları</span>
           </button>
         </div>
