@@ -43,6 +43,7 @@ export default function App() {
   
   // Toast state
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
+  const [loadingStep, setLoadingStep] = useState(1);
 
   // Load configuration from localStorage
   useEffect(() => {
@@ -149,6 +150,20 @@ export default function App() {
     setShowLayout(false);
     setRenderedHtml('');
     setLastResponseText('');
+    setLoadingStep(1);
+
+    const stepTimeouts = [];
+    const scheduleStep = (step, delay) => {
+      const t = setTimeout(() => {
+        setLoadingStep(step);
+      }, delay);
+      stepTimeouts.push(t);
+    };
+
+    scheduleStep(2, 3500);  // Step 2: Pedagoji Seçimi (3.5s)
+    scheduleStep(3, 7500);  // Step 3: Süre & Aşama Hesabı (7.5s)
+    scheduleStep(4, 12000); // Step 4: Değerlendirme Tasarımı (12s)
+    scheduleStep(5, 17000); // Step 5: Kaynakça & Şablonlama (17s)
 
     // Smooth scroll to loading card
     setTimeout(() => {
@@ -817,6 +832,7 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
       console.error(error);
     } finally {
       setIsLoading(false);
+      stepTimeouts.forEach(clearTimeout);
     }
   };
 
@@ -1211,13 +1227,160 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
 
         {/* 3. Loading Card (Appears under form during generation) */}
         {isLoading && (
-          <section id="loadingSection" className="glass-panel rounded-3xl p-16 text-center space-y-6 bg-white shadow-xl border border-slate-100 flex flex-col items-center justify-center">
-            <RefreshCw className="w-16 h-16 text-indigo-600 animate-spin" />
-            <div>
-              <h3 className="text-xl font-bold text-slate-800">Senaryo Planı Hazırlanıyor...</h3>
-              <p className="text-sm text-slate-500 mt-2">
-                Yapay zeka pedagojik rehberlere ve Türkiye Yüzyılı Maarif Modeli müfredatına uygun planı tasarlıyor. Bu işlem 1 dakikaya kadar sürebilir.
-              </p>
+          <section id="loadingSection" className="glass-panel rounded-3xl p-8 md:p-12 bg-white shadow-xl border border-slate-100 space-y-8">
+            {/* Header + Spinner Row */}
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-6 border-b border-slate-100">
+              <div className="flex items-center gap-4 text-left">
+                <div className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl animate-spin">
+                  <RefreshCw className="w-8 h-8" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-slate-800">Yapay Zeka Tasarım Yapıyor...</h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Pedagojik rehberler ve Türkiye Yüzyılı Maarif Modeli kriterleri işleniyor.
+                  </p>
+                </div>
+              </div>
+              
+              {/* Simulated Percentage Indicator */}
+              <div className="text-2xl font-black text-indigo-600 bg-indigo-50 px-4 py-2 rounded-2xl border border-indigo-100">
+                {loadingStep === 1 && "20%"}
+                {loadingStep === 2 && "45%"}
+                {loadingStep === 3 && "65%"}
+                {loadingStep === 4 && "85%"}
+                {loadingStep >= 5 && "95%"}
+              </div>
+            </div>
+
+            {/* YAPAY ZEKA TASARIM SÜRECİ Stepper */}
+            <div className="bg-indigo-50/40 border border-indigo-100/40 rounded-2xl p-6 text-left space-y-4">
+              <div className="text-[10px] md:text-xs font-black text-indigo-700/80 tracking-wider uppercase">
+                YAPAY ZEKA TASARIM SÜRECİ
+              </div>
+              
+              <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 lg:gap-2">
+                {/* Step 1: Müfredat Analizi */}
+                <div className="flex items-center gap-2">
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border transition-all ${
+                    loadingStep > 1 
+                      ? 'bg-emerald-100 text-emerald-600 border-emerald-300' 
+                      : loadingStep === 1 
+                        ? 'bg-indigo-100 text-indigo-600 border-indigo-300 animate-pulse' 
+                        : 'bg-slate-100 text-slate-400 border-slate-200'
+                  }`}>
+                    {loadingStep > 1 ? "✓" : "1"}
+                  </div>
+                  <span className={`text-xs font-bold transition-all ${
+                    loadingStep > 1 
+                      ? 'text-emerald-600' 
+                      : loadingStep === 1 
+                        ? 'text-indigo-600' 
+                        : 'text-slate-400'
+                  }`}>
+                    Müfredat Analizi
+                  </span>
+                </div>
+
+                {/* Arrow / Line for desktop */}
+                <div className="hidden lg:block h-0.5 flex-1 bg-slate-200 mx-2" />
+
+                {/* Step 2: Pedagoji Seçimi */}
+                <div className="flex items-center gap-2">
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border transition-all ${
+                    loadingStep > 2 
+                      ? 'bg-emerald-100 text-emerald-600 border-emerald-300' 
+                      : loadingStep === 2 
+                        ? 'bg-indigo-100 text-indigo-600 border-indigo-300 animate-pulse' 
+                        : 'bg-slate-100 text-slate-400 border-slate-200'
+                  }`}>
+                    {loadingStep > 2 ? "✓" : "2"}
+                  </div>
+                  <span className={`text-xs font-bold transition-all ${
+                    loadingStep > 2 
+                      ? 'text-emerald-600' 
+                      : loadingStep === 2 
+                        ? 'text-indigo-600' 
+                        : 'text-slate-400'
+                  }`}>
+                    Pedagoji Seçimi
+                  </span>
+                </div>
+
+                {/* Arrow / Line for desktop */}
+                <div className="hidden lg:block h-0.5 flex-1 bg-slate-200 mx-2" />
+
+                {/* Step 3: Süre & Aşama Hesabı */}
+                <div className="flex items-center gap-2">
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border transition-all ${
+                    loadingStep > 3 
+                      ? 'bg-emerald-100 text-emerald-600 border-emerald-300' 
+                      : loadingStep === 3 
+                        ? 'bg-indigo-100 text-indigo-600 border-indigo-300 animate-pulse' 
+                        : 'bg-slate-100 text-slate-400 border-slate-200'
+                  }`}>
+                    {loadingStep > 3 ? "✓" : "3"}
+                  </div>
+                  <span className={`text-xs font-bold transition-all ${
+                    loadingStep > 3 
+                      ? 'text-emerald-600' 
+                      : loadingStep === 3 
+                        ? 'text-indigo-600' 
+                        : 'text-slate-400'
+                  }`}>
+                    Süre & Aşama Hesabı
+                  </span>
+                </div>
+
+                {/* Arrow / Line for desktop */}
+                <div className="hidden lg:block h-0.5 flex-1 bg-slate-200 mx-2" />
+
+                {/* Step 4: Değerlendirme Tasarımı */}
+                <div className="flex items-center gap-2">
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border transition-all ${
+                    loadingStep > 4 
+                      ? 'bg-emerald-100 text-emerald-600 border-emerald-300' 
+                      : loadingStep === 4 
+                        ? 'bg-indigo-100 text-indigo-600 border-indigo-300 animate-pulse' 
+                        : 'bg-slate-100 text-slate-400 border-slate-200'
+                  }`}>
+                    {loadingStep > 4 ? "✓" : "4"}
+                  </div>
+                  <span className={`text-xs font-bold transition-all ${
+                    loadingStep > 4 
+                      ? 'text-emerald-600' 
+                      : loadingStep === 4 
+                        ? 'text-indigo-600' 
+                        : 'text-slate-400'
+                  }`}>
+                    Değerlendirme Tasarımı
+                  </span>
+                </div>
+
+                {/* Arrow / Line for desktop */}
+                <div className="hidden lg:block h-0.5 flex-1 bg-slate-200 mx-2" />
+
+                {/* Step 5: Kaynakça & Şablonlama */}
+                <div className="flex items-center gap-2">
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border transition-all ${
+                    loadingStep > 5 
+                      ? 'bg-emerald-100 text-emerald-600 border-emerald-300' 
+                      : loadingStep === 5 
+                        ? 'bg-indigo-100 text-indigo-600 border-indigo-300 animate-pulse' 
+                        : 'bg-slate-100 text-slate-400 border-slate-200'
+                  }`}>
+                    {loadingStep > 5 ? "✓" : "5"}
+                  </div>
+                  <span className={`text-xs font-bold transition-all ${
+                    loadingStep > 5 
+                      ? 'text-emerald-600' 
+                      : loadingStep === 5 
+                        ? 'text-indigo-600' 
+                        : 'text-slate-400'
+                  }`}>
+                    Kaynakça & Şablonlama
+                  </span>
+                </div>
+              </div>
             </div>
           </section>
         )}
