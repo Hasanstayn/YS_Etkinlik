@@ -28,6 +28,7 @@ export default function InputForm({
   kazanim, setKazanim,
   selectedZones, setSelectedZones,
   selectedSkills, setSelectedSkills,
+  useMebKit, setUseMebKit,
   onSubmit, isLoading
 }) {
 
@@ -166,6 +167,23 @@ export default function InputForm({
               className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all bg-slate-50 text-sm"
             />
           </div>
+        </div>
+
+        {/* MEB-KİT Option Checkbox */}
+        <div className="flex items-start gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
+          <input
+            id="useMebKit"
+            type="checkbox"
+            checked={useMebKit}
+            onChange={(e) => setUseMebKit(e.target.checked)}
+            className="w-5 h-5 text-blue-600 border-slate-300 rounded focus:ring-blue-500 cursor-pointer mt-0.5"
+          />
+          <label htmlFor="useMebKit" className="text-sm font-bold text-slate-700 cursor-pointer select-none">
+            🎒 Plana MEB-KİT Kullanım Önerisini Dahil Et
+            <span className="block text-xs font-normal text-slate-500 mt-0.5 leading-relaxed">
+              İşaretlenirse, kodlama ve içerik geliştirme adımlarında MEB-KİT setlerinin kullanılması önerilir. İşaretlenmezse, Scratch, Tinkercad gibi standart ve basit araçlar tavsiye edilir.
+            </span>
+          </label>
         </div>
 
         <div className="space-y-2">
