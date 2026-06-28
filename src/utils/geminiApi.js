@@ -27,9 +27,9 @@ export async function callGeminiText(systemText, userText, apiKey, retryCount = 
         contents: [{ parts: [{ text: combinedText }] }]
     };
     
-    // 35-second timeout using AbortController (ample time for generating long templates)
+    // 90-second timeout using AbortController (gives ample time for generating long lesson plans even under heavy load)
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 35000);
+    const timeoutId = setTimeout(() => controller.abort(), 90000);
     
     try {
         const response = await fetch(url, { 
@@ -45,8 +45,8 @@ export async function callGeminiText(systemText, userText, apiKey, retryCount = 
             let errMsg = `HTTP Hatası: ${response.status}`;
             let isRetryable = true;
             
-            // Client errors like 400 (Bad Request) or 403 (Forbidden) are not retryable
-            if (response.status === 400 || response.status === 403) {
+            // Client errors like 400 (Bad Request) or 403 (Forbidden) are not retryable (except rate limit 429)
+            if ((response.status === 400 || response.status === 403) && response.status !== 429) {
                 isRetryable = false;
             }
             
@@ -69,7 +69,7 @@ export async function callGeminiText(systemText, userText, apiKey, retryCount = 
         
         const isTimeout = error.name === 'AbortError';
         const errMessage = isTimeout 
-            ? "Zaman aşımı (35 sn)" 
+            ? "Zaman aşımı (90 sn)" 
             : error.message;
             
         const failedInfo = `${modelName}: ${errMessage}`;
@@ -83,8 +83,8 @@ export async function callGeminiText(systemText, userText, apiKey, retryCount = 
         }
 
         if (retryCount < 4) { // Allow up to 4 retries (5 models tried in total)
-            // Wait 1.0 second and retry with fallback model
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            // Wait 2.5 seconds and retry with fallback model to bypass rate limiting
+            await new Promise(resolve => setTimeout(resolve, 2500));
             return callGeminiText(systemText, userText, apiKey, retryCount + 1, newErrorList);
         }
         
