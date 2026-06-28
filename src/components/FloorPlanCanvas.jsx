@@ -213,35 +213,32 @@ export default function FloorPlanCanvas({ selectedZones }) {
       const isSelected = item.id === selectedId;
 
       if (item.type === 'desk') {
-        const yOffset = -HEIGHT / 2;
+        const yOffset = -HEIGHT / 2; // -14
 
-        // 1. Draw outer wood/bezel border
+        // 1. Draw outer wood/bezel border using the chamfered semi-octagon polygon (W_TOP = 40, W_MAX = 64, W_BOT = 32)
         ctx.fillStyle = '#b45309'; // Warm wood edge color
         ctx.strokeStyle = '#475569'; // Slate frame border
         ctx.lineWidth = 1.5;
         ctx.beginPath();
-        ctx.moveTo(-LONG_BASE / 2, yOffset + HEIGHT);
-        ctx.lineTo(LONG_BASE / 2, yOffset + HEIGHT);
-        ctx.lineTo(SHORT_BASE / 2, yOffset);
-        ctx.lineTo(-SHORT_BASE / 2, yOffset);
+        ctx.moveTo(-20, -14); // Top-left
+        ctx.lineTo(20, -14);  // Top-right
+        ctx.lineTo(32, -2);   // Mid-right (widest)
+        ctx.lineTo(16, 14);   // Bottom-right
+        ctx.lineTo(-16, 14);  // Bottom-left
+        ctx.lineTo(-32, -2);  // Mid-left (widest)
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
 
         // 2. Draw inner laminate desk top surface (inset by 3px)
-        const inset = 3;
-        const scaleX = (LONG_BASE - inset * 2) / LONG_BASE;
-        const scaleY = (HEIGHT - inset * 2) / HEIGHT;
-        
         ctx.fillStyle = '#fef3c7'; // Light maple/oak surface
         ctx.beginPath();
-        const iyOffset = - (HEIGHT - inset*2) / 2;
-        const iLong = LONG_BASE / 2 - inset * 1.5;
-        const iShort = SHORT_BASE / 2 - inset * 0.7;
-        ctx.moveTo(-iLong, iyOffset + HEIGHT - inset*2);
-        ctx.lineTo(iLong, iyOffset + HEIGHT - inset*2);
-        ctx.lineTo(iShort, iyOffset);
-        ctx.lineTo(-iShort, iyOffset);
+        ctx.moveTo(-18, -11); // Inset top-left
+        ctx.lineTo(18, -11);  // Inset top-right
+        ctx.lineTo(29, -2);   // Inset mid-right
+        ctx.lineTo(14, 11);   // Inset bottom-right
+        ctx.lineTo(-14, 11);  // Inset bottom-left
+        ctx.lineTo(-29, -2);  // Inset mid-left
         ctx.closePath();
         ctx.fill();
 
@@ -251,9 +248,9 @@ export default function FloorPlanCanvas({ selectedZones }) {
         ctx.lineWidth = 1;
         ctx.beginPath();
         if (ctx.roundRect) {
-          ctx.roundRect(-8, yOffset + 10, 16, 11, 2);
+          ctx.roundRect(-8, -4, 16, 11, 2);
         } else {
-          ctx.rect(-8, yOffset + 10, 16, 11);
+          ctx.rect(-8, -4, 16, 11);
         }
         ctx.fill();
         ctx.stroke();
@@ -261,15 +258,15 @@ export default function FloorPlanCanvas({ selectedZones }) {
         // Draw tiny lines on notebook
         ctx.strokeStyle = '#94a3b8';
         ctx.beginPath();
-        ctx.moveTo(-5, yOffset + 13);
-        ctx.lineTo(5, yOffset + 13);
-        ctx.moveTo(-5, yOffset + 16);
-        ctx.lineTo(5, yOffset + 16);
+        ctx.moveTo(-5, -1);
+        ctx.lineTo(5, -1);
+        ctx.moveTo(-5, 2);
+        ctx.lineTo(5, 2);
         ctx.stroke();
 
         // 4. Draw modern student chair (with wheels/five spokes)
         const chairX = 0;
-        const chairY = yOffset + HEIGHT + 12;
+        const chairY = 26; // Chair placed at the bottom edge (y = 14 + 12 = 26)
         
         // Draw 5-star base of chair
         ctx.strokeStyle = '#475569';
@@ -509,8 +506,8 @@ export default function FloorPlanCanvas({ selectedZones }) {
     setItems(prev =>
       prev.map(item => {
         if (item.id === selectedId) {
-          // Desks rotate by 60 degrees to snap configurations, others by 45 degrees
-          const step = item.type === 'desk' ? 60 : 45;
+          // Desks rotate by 15 degrees for fine-grained alignments, others by 45 degrees
+          const step = item.type === 'desk' ? 15 : 45;
           return { ...item, rotation: (item.rotation + step) % 360 };
         }
         return item;
@@ -561,6 +558,21 @@ export default function FloorPlanCanvas({ selectedZones }) {
         const rad = (angle * Math.PI) / 180;
         newGroupItems.push({
           id: `desk_hex_${timestamp}_${i}`,
+          type: 'desk',
+          x: cx + R * Math.cos(rad),
+          y: cy + R * Math.sin(rad),
+          rotation: angle + 90
+        });
+      }
+    } else if (groupType === 'octagon') {
+      // 8 modular desks in an octagon (W_BOT = 32, W_TOP = 40, W_MAX = 64, H = 28)
+      // Radius R is chosen to align the chamfered desks into a beautiful hollow octagon
+      const R = 44; 
+      for (let i = 0; i < 8; i++) {
+        const angle = i * 45;
+        const rad = (angle * Math.PI) / 180;
+        newGroupItems.push({
+          id: `desk_oct_${timestamp}_${i}`,
           type: 'desk',
           x: cx + R * Math.cos(rad),
           y: cy + R * Math.sin(rad),
@@ -776,6 +788,12 @@ export default function FloorPlanCanvas({ selectedZones }) {
                 className="flex items-center gap-1 px-3 py-2 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 rounded-xl text-xs font-semibold text-indigo-800 shadow-sm transition-all"
               >
                 <span>🛑 Altılı Takım Kümesi (Hexagon)</span>
+              </button>
+              <button
+                onClick={() => handleAddGroup('octagon')}
+                className="flex items-center gap-1 px-3 py-2 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 rounded-xl text-xs font-semibold text-indigo-800 shadow-sm transition-all"
+              >
+                <span>🌀 Sekizli Takım Kümesi (Ahtapot)</span>
               </button>
             </div>
           </div>
