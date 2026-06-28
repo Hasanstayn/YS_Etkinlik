@@ -13,8 +13,8 @@ export async function callGeminiText(systemText, userText, apiKey, retryCount = 
         modelName = "gemini-1.5-flash";
     }
     
-    // Using stable v1 API for broad compatibility
-    const url = `https://generativelanguage.googleapis.com/v1/models/${modelName}:generateContent?key=${apiKey}`;
+    // Using v1beta API for access to newer models (gemini-2.5-flash, gemini-2.0-flash)
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
     
     // Prepend system instructions to the main content since the stable v1 API doesn't support the systemInstruction top-level field
     const combinedText = `[SİSTEM TALİMATLARI - PEDAGOJİK VE YAZIMSAL KURALLAR]\n${systemText}\n\n[KULLANICI TALEBİ VE GİRDİLERİ]\n${userText}`;
