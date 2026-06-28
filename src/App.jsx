@@ -34,6 +34,7 @@ export default function App() {
   const [selectedZones, setSelectedZones] = useState([]);
   const [selectedSkills, setSelectedSkills] = useState(['İletişim', 'İş Birliği', 'Eleştirel Düşünme', 'Yaratıcılık']);
   const [useMebKit, setUseMebKit] = useState(false);
+  const [use3DPrinter, setUse3DPrinter] = useState(false);
   
   // Output & Loading States
   const [isLoading, setIsLoading] = useState(false);
@@ -690,7 +691,7 @@ Bu bilgileri MEB'in güncel Türkiye Yüzyılı Maarif Modeli öğretim programl
 PEDAGOJİK VE METODOLOJİK KURALLAR:
 1. Rol Tanımları: Öğrenciler aktif araştırmacı, öğretmen ise rehberdir. Geleneksel düz anlatımı tamamen ortadan kaldırın.
 2. 4C Entegrasyonu: Her adımda öğrencilerin İletişim, İş Birliği, Eleştirel Düşünme ve Yaratıcılık becerilerini nasıl sergilediğini açıklayın.
-3. Teknolojinin Rolü: Teknolojiyi sadece sunum veya tüketim için değil, esnek öğrenme alanlarına uygun olarak aktif üretim ve analiz (${useMebKit ? 'MEB-KİT kodlama, ' : ''}3B modelleme, Scratch vb.) için konumlandırın. ${useMebKit ? '' : 'KESİNLİKLE MEB-KİT (veya MEB KİT) kullanımını önermeyin/tavsiye etmeyin.'}
+3. Teknolojinin Rolü: Teknolojiyi sadece sunum veya tüketim için değil, esnek öğrenme alanlarına uygun olarak aktif üretim ve analiz (${useMebKit ? 'MEB-KİT kodlama, ' : ''}3B modelleme ${use3DPrinter ? '(3B Yazıcı baskısı dahil)' : '(sadece ekran üzerinde dijital modelleme, fiziksel baskı KESİNLİKLE önermeyin!)'}, Scratch vb.) için konumlandırın. ${useMebKit ? '' : 'KESİNLİKLE MEB-KİT (veya MEB KİT) kullanımını önermeyin/tavsiye etmeyin.'} ${use3DPrinter ? '' : 'KESİNLİKLE fiziksel 3B Yazıcı (3D Printer) cihazı kullanımı veya baskı almayı önermeyin.'}
 `;
       webAraclariKategorileri = `
 KATEGORİLERE GÖRE TAVSİYE EDİLEN YAPAY ZEKA VE WEB 2.0 ARAÇLARI:
@@ -701,8 +702,8 @@ KATEGORİLERE GÖRE TAVSİYE EDİLEN YAPAY ZEKA VE WEB 2.0 ARAÇLARI:
 - Sunum/Etkileşim: Genially, Prezi, Kahoot
 `;
       ekYonergeKurali = `
-ÖNEMLİ YÖNERGE KURALI (${useMebKit ? 'MEB-KİT, ' : ''}3B Yazıcı ve Kategori Dışı Araçlar İçin):
-Eğer senaryoda ${useMebKit ? '"MEB-KİT", ' : ''}"3B Yazıcı" veya yukarıdaki listelerde bulunmayan farklı bir çevrim içi araç kullanılıyorsa, EKLER bölümüne KESİNLİKLE detaylı bir "Uygulama Yönergesi" tablosu ekleyin. ${useMebKit ? 'Devre bağlantıları, pin yapılandırmaları veya ' : ''}3D baskı (slicing) ayarlarını adım adım belirtin. ${useMebKit ? '' : 'KESİNLİKLE MEB-KİT (veya MEB KİT) önermeyin ve buna dair bir yönerge eklemeyin.'}
+ÖNEMLİ YÖNERGE KURALI (${useMebKit ? 'MEB-KİT, ' : ''}${use3DPrinter ? '3B Yazıcı, ' : ''}ve Kategori Dışı Araçlar İçin):
+Eğer senaryoda ${useMebKit ? '"MEB-KİT", ' : ''}${use3DPrinter ? '"3B Yazıcı", ' : ''}veya yukarıdaki listelerde bulunmayan farklı ve karmaşık bir çevrim içi araç kullanılıyorsa, EKLER bölümüne KESİNLİKLE detaylı bir "Uygulama Yönergesi" tablosu ekleyin. ${useMebKit ? 'Devre bağlantıları, pin yapılandırmaları veya ' : ''}${use3DPrinter ? '3D baskı (slicing) ayarlarını ' : ''}adım adım belirtin. ${useMebKit ? '' : 'KESİNLİKLE MEB-KİT (veya MEB KİT) önermeyin ve buna dair bir yönerge eklemeyin.'} ${use3DPrinter ? '' : 'KESİNLİKLE 3B Yazıcı (3D Printer) önermeyin ve 3D baskı dilimleme (slicing) yönergesi eklemeyin.'}
 `;
 
       if (belgeTuru === "etkinlikPlani") {
@@ -1229,6 +1230,8 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
             setSelectedSkills={setSelectedSkills}
             useMebKit={useMebKit}
             setUseMebKit={setUseMebKit}
+            use3DPrinter={use3DPrinter}
+            setUse3DPrinter={setUse3DPrinter}
             onSubmit={handleSubmit}
             isLoading={isLoading}
           />

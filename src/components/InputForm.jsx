@@ -29,6 +29,7 @@ export default function InputForm({
   selectedZones, setSelectedZones,
   selectedSkills, setSelectedSkills,
   useMebKit, setUseMebKit,
+  use3DPrinter, setUse3DPrinter,
   onSubmit, isLoading
 }) {
 
@@ -169,21 +170,41 @@ export default function InputForm({
           </div>
         </div>
 
-        {/* MEB-KİT Option Checkbox */}
-        <div className="flex items-start gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
-          <input
-            id="useMebKit"
-            type="checkbox"
-            checked={useMebKit}
-            onChange={(e) => setUseMebKit(e.target.checked)}
-            className="w-5 h-5 text-blue-600 border-slate-300 rounded focus:ring-blue-500 cursor-pointer mt-0.5"
-          />
-          <label htmlFor="useMebKit" className="text-sm font-bold text-slate-700 cursor-pointer select-none">
-            🎒 Plana MEB-KİT Kullanım Önerisini Dahil Et
-            <span className="block text-xs font-normal text-slate-500 mt-0.5 leading-relaxed">
-              İşaretlenirse, kodlama ve içerik geliştirme adımlarında MEB-KİT setlerinin kullanılması önerilir. İşaretlenmezse, Scratch, Tinkercad gibi standart ve basit araçlar tavsiye edilir.
-            </span>
-          </label>
+        {/* Dynamic Tool Exclusions Checkboxes */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* MEB-KİT Option Checkbox */}
+          <div className="flex items-start gap-3 p-3.5 bg-slate-50 border border-slate-200 rounded-xl hover:border-slate-300 hover:bg-slate-100/50 transition-all">
+            <input
+              id="useMebKit"
+              type="checkbox"
+              checked={useMebKit}
+              onChange={(e) => setUseMebKit(e.target.checked)}
+              className="w-5 h-5 text-blue-600 border-slate-300 rounded focus:ring-blue-500 cursor-pointer mt-0.5"
+            />
+            <label htmlFor="useMebKit" className="text-sm font-bold text-slate-700 cursor-pointer select-none">
+              🎒 Plana MEB-KİT Kullanım Önerisini Dahil Et
+              <span className="block text-xs font-normal text-slate-500 mt-0.5 leading-relaxed">
+                İşaretlenirse, kodlama ve içerik geliştirme adımlarında MEB-KİT setlerinin kullanılması önerilir. İşaretlenmezse, Scratch, Tinkercad gibi standart ve basit araçlar tavsiye edilir.
+              </span>
+            </label>
+          </div>
+
+          {/* 3D Printer Option Checkbox */}
+          <div className="flex items-start gap-3 p-3.5 bg-slate-50 border border-slate-200 rounded-xl hover:border-slate-300 hover:bg-slate-100/50 transition-all">
+            <input
+              id="use3DPrinter"
+              type="checkbox"
+              checked={use3DPrinter}
+              onChange={(e) => setUse3DPrinter(e.target.checked)}
+              className="w-5 h-5 text-blue-600 border-slate-300 rounded focus:ring-blue-500 cursor-pointer mt-0.5"
+            />
+            <label htmlFor="use3DPrinter" className="text-sm font-bold text-slate-700 cursor-pointer select-none">
+              🖨️ Plana 3B Yazıcı Kullanım Önerisini Dahil Et
+              <span className="block text-xs font-normal text-slate-500 mt-0.5 leading-relaxed">
+                İşaretlenirse, etkinlik üretim süreçlerinde 3D modellerin fiziksel baskısının alınması önerilir. İşaretlenmezse, sadece dijital/ekran tasarımı önerilir, fiziksel yazıcı gerekmez.
+              </span>
+            </label>
+          </div>
         </div>
 
         <div className="space-y-2">
