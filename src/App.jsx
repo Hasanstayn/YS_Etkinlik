@@ -1086,8 +1086,9 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
           <p className="text-slate-500 font-medium text-xs md:text-sm mt-0.5">
             Yapay Zeka Destekli Aktif Öğrenme Planlayıcısı
           </p>
-          <div className="mt-1.5 inline-block bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-[10px] md:text-xs font-bold border border-indigo-100 shadow-sm">
-            👨‍🏫 Hasan YILMAZ - Matematik Öğretmeni - Ordu Yeğitek Proje Koordinatörü
+          <div className="mt-1.5 inline-flex flex-col items-center lg:items-start bg-indigo-50 text-indigo-700 px-3.5 py-1.5 rounded-2xl text-[10px] md:text-xs font-bold border border-indigo-100 shadow-sm leading-relaxed">
+            <div>👨‍🏫 Hasan YILMAZ - Matematik Öğretmeni</div>
+            <div className="text-indigo-600/90 font-medium">Ordu Yeğitek Proje Koordinatörü</div>
           </div>
         </div>
 
