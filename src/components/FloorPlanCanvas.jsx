@@ -447,7 +447,27 @@ export default function FloorPlanCanvas({ selectedZones }) {
     if (!isEditing) return;
     const { x, y } = getCanvasCoords(e);
 
-    // Find clicked item
+    // 1. Check if clicked on the rotation handle (blue dot) of the currently selected item
+    if (selectedId) {
+      const selectedItem = items.find(item => item.id === selectedId);
+      if (selectedItem) {
+        const rotRad = (selectedItem.rotation * Math.PI) / 180;
+        const handleX = selectedItem.x + Math.sin(rotRad) * 45;
+        const handleY = selectedItem.y - Math.cos(rotRad) * 45;
+        const distToHandle = Math.hypot(x - handleX, y - handleY);
+        
+        if (distToHandle < 12) { // 12px grab area
+          dragRef.current = {
+            id: selectedId,
+            isRotating: true
+          };
+          if (e.cancelable) e.preventDefault();
+          return;
+        }
+      }
+    }
+
+    // 2. Find clicked item for movement
     let foundItem = null;
     // Search in reverse order to click top items first
     for (let i = items.length - 1; i >= 0; i--) {
@@ -464,10 +484,10 @@ export default function FloorPlanCanvas({ selectedZones }) {
       setSelectedId(foundItem.id);
       dragRef.current = {
         id: foundItem.id,
+        isRotating: false,
         offsetX: x - foundItem.x,
         offsetY: y - foundItem.y
       };
-      // Prevent scrolling when dragging on touch devices
       if (e.cancelable) e.preventDefault();
     } else {
       setSelectedId(null);
@@ -477,19 +497,42 @@ export default function FloorPlanCanvas({ selectedZones }) {
   const handleMove = (e) => {
     if (!isEditing || !dragRef.current) return;
     const { x, y } = getCanvasCoords(e);
-    const { id, offsetX, offsetY } = dragRef.current;
-
-    setItems(prevItems => 
-      prevItems.map(item => {
-        if (item.id === id) {
-          // Clamp inside canvas boundaries
-          const nx = Math.max(30, Math.min(canvasRef.current.width - 30, x - offsetX));
-          const ny = Math.max(30, Math.min(canvasRef.current.height - 30, y - offsetY));
-          return { ...item, x: nx, y: ny };
-        }
-        return item;
-      })
-    );
+    
+    if (dragRef.current.isRotating) {
+      // Dynamic rotation drag logic
+      const { id } = dragRef.current;
+      setItems(prevItems => 
+        prevItems.map(item => {
+          if (item.id === id) {
+            const dx = x - item.x;
+            const dy = y - item.y;
+            let angleDeg = (Math.atan2(dy, dx) * 180) / Math.PI;
+            let newRotation = (angleDeg + 90 + 360) % 360;
+            
+            // Snap to clean angles (15 degrees for student desks, 45 degrees for others)
+            const step = item.type === 'desk' ? 15 : 45;
+            newRotation = Math.round(newRotation / step) * step;
+            
+            return { ...item, rotation: newRotation % 360 };
+          }
+          return item;
+        })
+      );
+    } else {
+      // Drag position movement logic
+      const { id, offsetX, offsetY } = dragRef.current;
+      setItems(prevItems => 
+        prevItems.map(item => {
+          if (item.id === id) {
+            // Clamp inside canvas boundaries
+            const nx = Math.max(30, Math.min(canvasRef.current.width - 30, x - offsetX));
+            const ny = Math.max(30, Math.min(canvasRef.current.height - 30, y - offsetY));
+            return { ...item, x: nx, y: ny };
+          }
+          return item;
+        })
+      );
+    }
   };
 
   const handleEnd = () => {
