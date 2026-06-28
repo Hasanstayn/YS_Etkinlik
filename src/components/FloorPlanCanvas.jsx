@@ -547,8 +547,9 @@ export default function FloorPlanCanvas({ selectedZones }) {
     const timestamp = Date.now();
 
     if (groupType === 'hex') {
-      // 6 modular desks in a hexagon
-      const R = 30;
+      // 6 modular desks in a hexagon (W_MAX = 64, H = 28)
+      // Radius R is optimized to make adjacent desks touch side-by-side perfectly
+      const R = 54; 
       for (let i = 0; i < 6; i++) {
         const angle = i * 60;
         const rad = (angle * Math.PI) / 180;
@@ -561,9 +562,9 @@ export default function FloorPlanCanvas({ selectedZones }) {
         });
       }
     } else if (groupType === 'octagon') {
-      // 8 modular desks in an octagon (W_BOT = 32, W_TOP = 40, W_MAX = 64, H = 28)
-      // Radius R is chosen to align the chamfered desks into a beautiful hollow octagon
-      const R = 44; 
+      // 8 modular desks in an octagon (W_MAX = 64, H = 28)
+      // Radius R is optimized to align the semi-octagonal desks into a beautiful hollow octagon
+      const R = 72; 
       for (let i = 0; i < 8; i++) {
         const angle = i * 45;
         const rad = (angle * Math.PI) / 180;
@@ -577,7 +578,8 @@ export default function FloorPlanCanvas({ selectedZones }) {
       }
     } else if (groupType === 'tri') {
       // 3 modular desks in a triangle
-      const R = 18;
+      // Radius R is optimized to let the three desks touch side-by-side perfectly
+      const R = 32;
       for (let i = 0; i < 3; i++) {
         const angle = i * 120 - 30;
         const rad = (angle * Math.PI) / 180;
@@ -594,17 +596,17 @@ export default function FloorPlanCanvas({ selectedZones }) {
       newGroupItems.push({ id: `desk_double_${timestamp}_0`, type: 'desk', x: cx, y: cy - 14, rotation: 180 });
       newGroupItems.push({ id: `desk_double_${timestamp}_1`, type: 'desk', x: cx, y: cy + 14, rotation: 0 });
     } else if (groupType === 'quad') {
-      // 4-person block (two double desks side-by-side)
-      newGroupItems.push({ id: `desk_quad_${timestamp}_0`, type: 'desk', x: cx - 16, y: cy - 14, rotation: 180 });
-      newGroupItems.push({ id: `desk_quad_${timestamp}_1`, type: 'desk', x: cx - 16, y: cy + 14, rotation: 0 });
-      newGroupItems.push({ id: `desk_quad_${timestamp}_2`, type: 'desk', x: cx + 16, y: cy - 14, rotation: 180 });
-      newGroupItems.push({ id: `desk_quad_${timestamp}_3`, type: 'desk', x: cx + 16, y: cy + 14, rotation: 0 });
+      // 4-person block (two double desks side-by-side, spaced by 54px horizontally to avoid overlap)
+      newGroupItems.push({ id: `desk_quad_${timestamp}_0`, type: 'desk', x: cx - 27, y: cy - 14, rotation: 180 });
+      newGroupItems.push({ id: `desk_quad_${timestamp}_1`, type: 'desk', x: cx - 27, y: cy + 14, rotation: 0 });
+      newGroupItems.push({ id: `desk_quad_${timestamp}_2`, type: 'desk', x: cx + 27, y: cy - 14, rotation: 180 });
+      newGroupItems.push({ id: `desk_quad_${timestamp}_3`, type: 'desk', x: cx + 27, y: cy + 14, rotation: 0 });
     } else if (groupType === 'zigzag') {
-      // 4-person zigzag row (alternating side-by-side)
-      newGroupItems.push({ id: `desk_zig_${timestamp}_0`, type: 'desk', x: cx - 48, y: cy + 14, rotation: 0 });
-      newGroupItems.push({ id: `desk_zig_${timestamp}_1`, type: 'desk', x: cx - 16, y: cy - 14, rotation: 180 });
-      newGroupItems.push({ id: `desk_zig_${timestamp}_2`, type: 'desk', x: cx + 16, y: cy + 14, rotation: 0 });
-      newGroupItems.push({ id: `desk_zig_${timestamp}_3`, type: 'desk', x: cx + 48, y: cy - 14, rotation: 180 });
+      // 4-person zigzag row (alternating side-by-side, spaced by 54px horizontally to avoid overlap)
+      newGroupItems.push({ id: `desk_zig_${timestamp}_0`, type: 'desk', x: cx - 81, y: cy + 14, rotation: 0 });
+      newGroupItems.push({ id: `desk_zig_${timestamp}_1`, type: 'desk', x: cx - 27, y: cy - 14, rotation: 180 });
+      newGroupItems.push({ id: `desk_zig_${timestamp}_2`, type: 'desk', x: cx + 27, y: cy + 14, rotation: 0 });
+      newGroupItems.push({ id: `desk_zig_${timestamp}_3`, type: 'desk', x: cx + 81, y: cy - 14, rotation: 180 });
     }
 
     setItems(prev => [...prev, ...newGroupItems]);
