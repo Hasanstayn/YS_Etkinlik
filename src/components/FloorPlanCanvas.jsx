@@ -2,7 +2,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { RotateCw, Trash2, PlusCircle, RefreshCw, Download, Layers, Unlink } from 'lucide-react';
 
-export default function FloorPlanCanvas({ selectedZones }) {
+export default function FloorPlanCanvas({ selectedZones, suggestedLayout, use3DPrinter }) {
   const canvasRef = useRef(null);
   const [items, setItems] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
@@ -14,13 +14,14 @@ export default function FloorPlanCanvas({ selectedZones }) {
   const LONG_BASE = 64;
   const HEIGHT = 28; // ~32 * sin(60)
 
-  // Initialize layout based on selectedZones
+  // Initialize layout based on selectedZones or AI suggestedLayout
   const resetLayout = () => {
     const defaultItems = [];
     let idCounter = 1;
     const nextId = (prefix) => `${prefix}_${idCounter++}_${Date.now()}`;
+    const timestamp = Date.now();
 
-    // Always place Teacher Desk
+    // 1. Always place Teacher Desk
     defaultItems.push({
       id: nextId('teacher'),
       type: 'teacherDesk',
@@ -30,102 +31,209 @@ export default function FloorPlanCanvas({ selectedZones }) {
       label: 'Öğretmen Kürsüsü'
     });
 
-    // Always place 3D Printer
-    defaultItems.push({
-      id: nextId('printer'),
-      type: 'printerTable',
-      x: 720,
-      y: 100,
-      rotation: 0
-    });
+    // 2. Place 3D Printer only if use3DPrinter is true
+    if (use3DPrinter) {
+      defaultItems.push({
+        id: nextId('printer'),
+        type: 'printerTable',
+        x: 720,
+        y: 100,
+        rotation: 0
+      });
+    }
 
-    // Generate zone-specific seating arrangements
-    const activeZones = selectedZones.length > 0 ? selectedZones : ['Araştırma', 'İş Birliği'];
+    // 3. Check if suggestedLayout is available
+    if (suggestedLayout && (suggestedLayout.groups || suggestedLayout.items)) {
+      const groups = suggestedLayout.groups || [];
+      const individualItems = suggestedLayout.items || [];
 
-    activeZones.forEach((zone) => {
-      if (zone === 'İş Birliği') {
-        // Place a Hexagonal Group (6-person) in the center-left area
-        const cx = 350;
-        const cy = 280;
-        const R = 30; // radius offset for centers
-        for (let i = 0; i < 6; i++) {
-          const angle = i * 60;
-          const rad = (angle * Math.PI) / 180;
-          defaultItems.push({
-            id: nextId('desk_hex'),
-            type: 'desk',
-            x: cx + R * Math.cos(rad),
-            y: cy + R * Math.sin(rad),
-            rotation: angle + 90
-          });
+      // Define grid spots for groups to prevent overlaps
+      const groupSpots = [
+        { cx: 350, cy: 260 },
+        { cx: 600, cy: 260 },
+        { cx: 250, cy: 460 },
+        { cx: 550, cy: 460 },
+        { cx: 450, cy: 110 }
+      ];
+
+      let spotIndex = 0;
+
+      // Spawn Groups
+      groups.forEach((groupType) => {
+        if (spotIndex >= groupSpots.length) return;
+        const { cx, cy } = groupSpots[spotIndex];
+        const groupId = `group_${groupType}_${timestamp}_${spotIndex}`;
+
+        if (groupType === 'hex') {
+          const R = 54; 
+          for (let i = 0; i < 6; i++) {
+            const angle = i * 60;
+            const rad = (angle * Math.PI) / 180;
+            defaultItems.push({
+              id: nextId('desk_hex'),
+              type: 'desk',
+              x: cx + R * Math.cos(rad),
+              y: cy + R * Math.sin(rad),
+              rotation: (angle - 90 + 360) % 360,
+              groupId
+            });
+          }
+          spotIndex++;
+        } else if (groupType === 'octagon') {
+          const R = 72; 
+          for (let i = 0; i < 8; i++) {
+            const angle = i * 45;
+            const rad = (angle * Math.PI) / 180;
+            defaultItems.push({
+              id: nextId('desk_oct'),
+              type: 'desk',
+              x: cx + R * Math.cos(rad),
+              y: cy + R * Math.sin(rad),
+              rotation: (angle - 90 + 360) % 360,
+              groupId
+            });
+          }
+          spotIndex++;
+        } else if (groupType === 'tri') {
+          const R = 32;
+          for (let i = 0; i < 3; i++) {
+            const angle = i * 120 - 30;
+            const rad = (angle * Math.PI) / 180;
+            defaultItems.push({
+              id: nextId('desk_tri'),
+              type: 'desk',
+              x: cx + R * Math.cos(rad),
+              y: cy + R * Math.sin(rad),
+              rotation: (angle - 90 + 360) % 360,
+              groupId
+            });
+          }
+          spotIndex++;
+        } else if (groupType === 'double') {
+          defaultItems.push({ id: nextId('desk_double'), type: 'desk', x: cx, y: cy - 14, rotation: 180, groupId });
+          defaultItems.push({ id: nextId('desk_double'), type: 'desk', x: cx, y: cy + 14, rotation: 0, groupId });
+          spotIndex++;
+        } else if (groupType === 'quad') {
+          defaultItems.push({ id: nextId('desk_quad'), type: 'desk', x: cx - 27, y: cy - 14, rotation: 180, groupId });
+          defaultItems.push({ id: nextId('desk_quad'), type: 'desk', x: cx - 27, y: cy + 14, rotation: 0, groupId });
+          defaultItems.push({ id: nextId('desk_quad'), type: 'desk', x: cx + 27, y: cy - 14, rotation: 180, groupId });
+          defaultItems.push({ id: nextId('desk_quad'), type: 'desk', x: cx + 27, y: cy + 14, rotation: 0, groupId });
+          spotIndex++;
+        } else if (groupType === 'zigzag') {
+          defaultItems.push({ id: nextId('desk_zig'), type: 'desk', x: cx - 81, y: cy + 14, rotation: 0, groupId });
+          defaultItems.push({ id: nextId('desk_zig'), type: 'desk', x: cx - 27, y: cy - 14, rotation: 180, groupId });
+          defaultItems.push({ id: nextId('desk_zig'), type: 'desk', x: cx + 27, y: cy + 14, rotation: 0, groupId });
+          defaultItems.push({ id: nextId('desk_zig'), type: 'desk', x: cx + 81, y: cy - 14, rotation: 180, groupId });
+          spotIndex++;
+        }
+      });
+
+      // Spawn Individual Items
+      let pcIndex = 0;
+      let poufIndex = 0;
+
+      individualItems.forEach((itemType) => {
+        if (itemType === 'pcDesk') {
+          const x = 280 + pcIndex * 80;
+          if (x < 680) {
+            defaultItems.push({ id: nextId('pc'), type: 'pcDesk', x, y: 70, rotation: 0 });
+            pcIndex++;
+          }
+        } else if (itemType === 'pouf') {
+          const x = 400 + (poufIndex % 4) * 60;
+          const y = 350 + Math.floor(poufIndex / 4) * 60;
+          const poufColors = ['#65a30d', '#334155', '#0284c7', '#ea580c'];
+          const color = poufColors[poufIndex % poufColors.length];
+          defaultItems.push({ id: nextId('pouf'), type: 'pouf', x, y, rotation: 0, color });
+          poufIndex++;
+        }
+      });
+    } else {
+      // Fallback to static selectedZones initialization
+      const activeZones = selectedZones.length > 0 ? selectedZones : ['Araştırma', 'İş Birliği'];
+
+      activeZones.forEach((zone) => {
+        if (zone === 'İş Birliği') {
+          const cx = 350;
+          const cy = 280;
+          const R = 54;
+          const groupId = `group_hex_${timestamp}_default`;
+          for (let i = 0; i < 6; i++) {
+            const angle = i * 60;
+            const rad = (angle * Math.PI) / 180;
+            defaultItems.push({
+              id: nextId('desk_hex'),
+              type: 'desk',
+              x: cx + R * Math.cos(rad),
+              y: cy + R * Math.sin(rad),
+              rotation: (angle - 90 + 360) % 360,
+              groupId
+            });
+          }
+
+          const tx = 200;
+          const ty = 460;
+          const rT = 32;
+          const groupTriId = `group_tri_${timestamp}_default`;
+          for (let i = 0; i < 3; i++) {
+            const angle = i * 120 - 30;
+            const rad = (angle * Math.PI) / 180;
+            defaultItems.push({
+              id: nextId('desk_tri'),
+              type: 'desk',
+              x: tx + rT * Math.cos(rad),
+              y: ty + rT * Math.sin(rad),
+              rotation: (angle - 90 + 360) % 360,
+              groupId: groupTriId
+            });
+          }
         }
 
-        // Place a Triangular Group (3-person) in the bottom-left area
-        const tx = 200;
-        const ty = 460;
-        const rT = 18;
-        for (let i = 0; i < 3; i++) {
-          const angle = i * 120 - 30;
-          const rad = (angle * Math.PI) / 180;
-          defaultItems.push({
-            id: nextId('desk_tri'),
-            type: 'desk',
-            x: tx + rT * Math.cos(rad),
-            y: ty + rT * Math.sin(rad),
-            rotation: i * 120 + 30
-          });
+        if (zone === 'Araştırma') {
+          defaultItems.push({ id: nextId('pc'), type: 'pcDesk', x: 280, y: 70, rotation: 0 });
+          defaultItems.push({ id: nextId('pc'), type: 'pcDesk', x: 360, y: 70, rotation: 0 });
+          defaultItems.push({ id: nextId('pc'), type: 'pcDesk', x: 440, y: 70, rotation: 0 });
         }
+
+        if (zone === 'Geliştirme') {
+          const cx = 580;
+          const cy = 250;
+          const doubleGroupId = `group_double_${timestamp}_default`;
+          defaultItems.push({ id: nextId('desk_double'), type: 'desk', x: cx, y: cy - 14, rotation: 180, groupId: doubleGroupId });
+          defaultItems.push({ id: nextId('desk_double'), type: 'desk', x: cx, y: cy + 14, rotation: 0, groupId: doubleGroupId });
+
+          defaultItems.push({ id: nextId('pouf'), type: 'pouf', x: 530, y: 220, rotation: 0, color: '#65a30d' });
+          defaultItems.push({ id: nextId('pouf'), type: 'pouf', x: 630, y: 220, rotation: 0, color: '#334155' });
+          defaultItems.push({ id: nextId('pouf'), type: 'pouf', x: 530, y: 280, rotation: 0, color: '#0284c7' });
+          defaultItems.push({ id: nextId('pouf'), type: 'pouf', x: 630, y: 280, rotation: 0, color: '#ea580c' });
+        }
+
+        if (zone === 'Sunum' || zone === 'Etkileşim') {
+          const cx = 700;
+          const cy = 440;
+          const sunumGroupId = `group_quad_${timestamp}_default`;
+          defaultItems.push({ id: nextId('desk_sunum'), type: 'desk', x: cx - 32, y: cy - 15, rotation: 270, groupId: sunumGroupId });
+          defaultItems.push({ id: nextId('desk_sunum'), type: 'desk', x: cx + 32, y: cy - 15, rotation: 90, groupId: sunumGroupId });
+          defaultItems.push({ id: nextId('desk_sunum'), type: 'desk', x: cx - 32, y: cy + 15, rotation: 270, groupId: sunumGroupId });
+          defaultItems.push({ id: nextId('desk_sunum'), type: 'desk', x: cx + 32, y: cy + 15, rotation: 90, groupId: sunumGroupId });
+        }
+      });
+
+      if (defaultItems.filter(item => item.type === 'desk').length === 0) {
+        const fallbackGroupId = `group_double_${timestamp}_fallback`;
+        defaultItems.push({ id: nextId('desk'), type: 'desk', x: 450, y: 300, rotation: 0, groupId: fallbackGroupId });
+        defaultItems.push({ id: nextId('desk'), type: 'desk', x: 450, y: 272, rotation: 180, groupId: fallbackGroupId });
       }
-
-      if (zone === 'Araştırma') {
-        // Place Wall Computer Stations on the top wall
-        defaultItems.push({ id: nextId('pc'), type: 'pcDesk', x: 280, y: 70, rotation: 0 });
-        defaultItems.push({ id: nextId('pc'), type: 'pcDesk', x: 360, y: 70, rotation: 0 });
-        defaultItems.push({ id: nextId('pc'), type: 'pcDesk', x: 440, y: 70, rotation: 0 });
-      }
-
-      if (zone === 'Geliştirme') {
-        // Place a Double Group (2-person) in the center-right area
-        const cx = 580;
-        const cy = 250;
-        defaultItems.push({ id: nextId('desk_double'), type: 'desk', x: cx, y: cy - 14, rotation: 180 });
-        defaultItems.push({ id: nextId('desk_double'), type: 'desk', x: cx, y: cy + 14, rotation: 0 });
-
-        // Add some colorful Pufe
-        defaultItems.push({ id: nextId('pouf'), type: 'pouf', x: 530, y: 220, rotation: 0, color: '#65a30d' });
-        defaultItems.push({ id: nextId('pouf'), type: 'pouf', x: 630, y: 220, rotation: 0, color: '#334155' });
-        defaultItems.push({ id: nextId('pouf'), type: 'pouf', x: 530, y: 280, rotation: 0, color: '#0284c7' });
-        defaultItems.push({ id: nextId('pouf'), type: 'pouf', x: 630, y: 280, rotation: 0, color: '#ea580c' });
-      }
-
-      if (zone === 'Sunum' || zone === 'Etkileşim') {
-        // Place modular desks in a semi-circular traditional layout at the bottom right
-        const cx = 700;
-        const cy = 440;
-        
-        // 4 desks in a square-like meeting arrangement
-        defaultItems.push({ id: nextId('desk_sunum'), type: 'desk', x: cx - 32, y: cy - 15, rotation: 270 });
-        defaultItems.push({ id: nextId('desk_sunum'), type: 'desk', x: cx + 32, y: cy - 15, rotation: 90 });
-        defaultItems.push({ id: nextId('desk_sunum'), type: 'desk', x: cx - 32, y: cy + 15, rotation: 270 });
-        defaultItems.push({ id: nextId('desk_sunum'), type: 'desk', x: cx + 32, y: cy + 15, rotation: 90 });
-      }
-    });
-
-    // Make sure we have at least some basic desks if array is too empty
-    if (defaultItems.filter(item => item.type === 'desk').length === 0) {
-      // 2-person double desk in center
-      defaultItems.push({ id: nextId('desk'), type: 'desk', x: 450, y: 300, rotation: 0 });
-      defaultItems.push({ id: nextId('desk'), type: 'desk', x: 450, y: 272, rotation: 180 });
     }
 
     setItems(defaultItems);
     setSelectedId(null);
   };
 
-  // Reset layout whenever selectedZones changes
+  // Reset layout whenever selectedZones, suggestedLayout, or use3DPrinter changes
   useEffect(() => {
     resetLayout();
-  }, [selectedZones]);
+  }, [selectedZones, suggestedLayout, use3DPrinter]);
 
   // Drawing Function
   useEffect(() => {

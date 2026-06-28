@@ -35,6 +35,7 @@ export default function App() {
   const [selectedSkills, setSelectedSkills] = useState(['İletişim', 'İş Birliği', 'Eleştirel Düşünme', 'Yaratıcılık']);
   const [useMebKit, setUseMebKit] = useState(false);
   const [use3DPrinter, setUse3DPrinter] = useState(false);
+  const [suggestedLayout, setSuggestedLayout] = useState(null);
   
   // Output & Loading States
   const [isLoading, setIsLoading] = useState(false);
@@ -801,10 +802,26 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
     }
 
     const systemPrompt = `${roleInstruction}\nDili akademik, profesyonel, anlaşılır and ${targetLangName} olarak kullan. Anlatımı markdown kullanarak biçimlendir.`;
-    const userPrompt = `Ders: ${ders}\nSeçilen Sınıf Seviyesi: ${sinif}. Sınıf\nÖğrenme Kazanımı: ${kazanim}\n\nÖNEMLİ KURAL: Eğer 'Öğrenme Kazanımı' metninin başında sınıf seviyesi rakamı kodlanmışsa ve seçilen sınıf seviyesi (${sinif}) ile çelişiyorsa, KESİNLİKLE kazanım kodunda yazan sınıf seviyesini esas al.\n\n${teknikPromptText}\n${mobilyaPromptText}\n${yzAracInstruction}\n${kaynakcaInstruction}\n${mufredatKurali}\n${pedagojikKurallar}\n${webAraclariKategorileri}\n${ekYonergeKurali}\nSeçilen Öğrenme Alanları: ${selectedZones.join(', ')}\nSeçilen 4C Becerileri: ${selected4CText}\nEtkinlik Süresi: ${sure} dakika\n\nLütfen yukarıdaki yönergelere uyarak planı/senaryoyu yazınız:\n${formatInstruction}`;
+    const userPrompt = `Ders: ${ders}\nSeçilen Sınıf Seviyesi: ${sinif}. Sınıf\nÖğrenme Kazanımı: ${kazanim}\n\nÖNEMLİ KURAL: Eğer 'Öğrenme Kazanımı' metninin başında sınıf seviyesi rakamı kodlanmışsa ve seçilen sınıf seviyesi (${sinif}) ile çelişiyorsa, KESİNLİKLE kazanım kodunda yazan sınıf seviyesini esas al.\n\n${teknikPromptText}\n${mobilyaPromptText}\n${yzAracInstruction}\n${kaynakcaInstruction}\n${mufredatKurali}\n${pedagojikKurallar}\n${webAraclariKategorileri}\n${ekYonergeKurali}\nSeçilen Öğrenme Alanları: ${selectedZones.join(', ')}\nSeçilen 4C Becerileri: ${selected4CText}\nEtkinlik Süresi: ${sure} dakika\n\nLütfen yukarıdaki yönergelere uyarak planı/senaryoyu yazınız:\n${formatInstruction}\n\nÖNEMLİ: Planın en sonuna (EKLER kısmının da altına), oluşturduğun bu planla en uyumlu sınıf düzenini (2D yerleşimi) başlatmak için KESİNLİKLE aşağıdaki JSON kodunu içeren tek bir markdown kod bloğu yerleştir. Başka hiçbir açıklama yazısı bu JSON bloğunun içine veya yanına ekleme. Sadece bu bloğu yaz:\n\`\`\`json\n{\n  "groups": ["hex", "tri"], \n  "items": ["pcDesk", "pcDesk", "pouf"]\n}\n\`\`\`\nKullanabileceğin grup anahtarları (groups): "hex" (6lı ahtapot), "octagon" (8li ahtapot), "tri" (3lü üçgen), "double" (2li düz), "quad" (4lü dikdörtgen), "zigzag" (4lü zikzak).\nKullanabileceğin bağımsız ürün anahtarları (items): "pcDesk" (bilgisayar masası), "pouf" (puf).`;
 
       const response = await callGeminiText(systemPrompt, userPrompt, apiKey);
-      setLastResponseText(response);
+      
+      // Extract the JSON layout block
+      let layoutData = null;
+      let cleanResponse = response;
+      const jsonRegex = /```json\s*(\{[\s\S]*?\})\s*```/;
+      const match = response.match(jsonRegex);
+      if (match) {
+        try {
+          layoutData = JSON.parse(match[1]);
+          cleanResponse = response.replace(jsonRegex, '').trim();
+        } catch (e) {
+          console.error("Failed to parse suggested layout JSON", e);
+        }
+      }
+      
+      setSuggestedLayout(layoutData);
+      setLastResponseText(cleanResponse);
       
       const logoHtml = `
       <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #e2e8f0; padding-bottom: 20px;">
@@ -817,7 +834,7 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
           </div>
       </div>`;
 
-      let formattedText = formatMarkdown(response);
+      let formattedText = formatMarkdown(cleanResponse);
       
       // Inject standard classes into compiled markdown tables using full-depth query selector
       const tempDiv = document.createElement('div');
@@ -1437,7 +1454,7 @@ Format Kuralı: Çıktını KESİNLİKLE sadece aşağıdaki markdown tablosu fo
                 onDrawLayout={handleDrawLayout}
               />
             </section>
-            {showLayout && <FloorPlanCanvas selectedZones={selectedZones} />}
+             {showLayout && <FloorPlanCanvas selectedZones={selectedZones} suggestedLayout={suggestedLayout} use3DPrinter={use3DPrinter} />}
           </div>
         )}
       </div>
