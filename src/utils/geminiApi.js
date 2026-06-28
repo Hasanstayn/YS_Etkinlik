@@ -5,12 +5,16 @@ export async function callGeminiText(systemText, userText, apiKey, retryCount = 
         throw new Error("Gemini API anahtarı eksik. Lütfen Ayarlar panelinden geçerli bir API anahtarı tanımlayın.");
     }
     
-    // Choose model based on retry count
-    let modelName = "gemini-2.5-flash";
+    // Fallback chain prioritizing the latest models (3.5 -> 3.1 -> 2.5 -> 2.0 -> latest)
+    let modelName = "gemini-3.5-flash";
     if (retryCount === 1) {
+        modelName = "gemini-3.1-flash-lite";
+    } else if (retryCount === 2) {
+        modelName = "gemini-2.5-flash";
+    } else if (retryCount === 3) {
         modelName = "gemini-2.0-flash";
-    } else if (retryCount >= 2) {
-        modelName = "gemini-flash-latest"; // Fallback to gemini-flash-latest which is available for the user
+    } else if (retryCount >= 4) {
+        modelName = "gemini-flash-latest";
     }
     
     // Using v1beta for modern model compatibility
@@ -78,9 +82,9 @@ export async function callGeminiText(systemText, userText, apiKey, retryCount = 
             throw new Error(failedInfo);
         }
 
-        if (retryCount < 2) {
-            // Wait 1.5 seconds and retry with fallback model
-            await new Promise(resolve => setTimeout(resolve, 1500));
+        if (retryCount < 4) { // Allow up to 4 retries (5 models tried in total)
+            // Wait 1.0 second and retry with fallback model
+            await new Promise(resolve => setTimeout(resolve, 1000));
             return callGeminiText(systemText, userText, apiKey, retryCount + 1, newErrorList);
         }
         
